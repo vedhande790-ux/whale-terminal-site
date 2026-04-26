@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐋</text></svg>">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>WHALE.TERMINAL v4.0 — Live Polymarket Intelligence</title>
@@ -30,7 +31,41 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9998;
 .hm-heatmap { display:grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap:12px; padding:12px; }
 .hm-heatmap .tile { background: rgba(0,0,0,.85); border-radius:6px; padding:8px; overflow:hidden; border:1px solid rgba(0,0,0,.4); }
 .hm-heatmap .tile .title { font-family: 'JetBrains Mono', monospace; font-size:12px; font-weight:700; color:#eafff0; line-height:1.25; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; text-overflow:ellipsis; }
-
+/* ── WHALE ALERT POPUP ── */
+#whale-alert-overlay{position:fixed;inset:0;z-index:999999;pointer-events:none;display:flex;align-items:flex-start;justify-content:center;padding-top:60px}
+#whale-alert{pointer-events:all;display:none;min-width:440px;max-width:520px;background:linear-gradient(135deg,#000d1a 0%,#001428 50%,#000a12 100%);border:1px solid rgba(0,212,255,.5);box-shadow:0 0 0 1px rgba(0,212,255,.1),0 0 40px rgba(0,212,255,.3),0 0 80px rgba(0,212,255,.1),inset 0 0 40px rgba(0,0,0,.6);animation:whalePop .4s cubic-bezier(.175,.885,.32,1.275) both;position:relative;overflow:hidden}
+@keyframes whalePop{0%{opacity:0;transform:translateY(-30px) scale(.92)}100%{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes whaleDismiss{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-20px) scale(.95)}}
+#whale-alert.dismissing{animation:whaleDismiss .25s ease forwards}
+#whale-alert::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#00d4ff 30%,#00ff88 70%,transparent);animation:scanLine 2s linear infinite}
+@keyframes scanLine{0%{opacity:.4}50%{opacity:1}100%{opacity:.4}}
+#whale-alert::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,212,255,.015) 3px,rgba(0,212,255,.015) 4px);pointer-events:none}
+.wa-corner{position:absolute;width:12px;height:12px;border-color:rgba(0,212,255,.7);border-style:solid}
+.wa-corner.tl{top:6px;left:6px;border-width:2px 0 0 2px}
+.wa-corner.tr{top:6px;right:6px;border-width:2px 2px 0 0}
+.wa-corner.bl{bottom:6px;left:6px;border-width:0 0 2px 2px}
+.wa-corner.br{bottom:6px;right:6px;border-width:0 2px 2px 0}
+.wa-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px 8px;border-bottom:1px solid rgba(0,212,255,.15)}
+.wa-title-row{display:flex;align-items:center;gap:8px}
+.wa-icon{font-size:22px;animation:whaleBob 1.5s ease-in-out infinite}
+@keyframes whaleBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+.wa-label{font-family:'Orbitron';font-size:9px;font-weight:900;letter-spacing:3px;color:#00d4ff;text-shadow:0 0 10px rgba(0,212,255,.8)}
+.wa-badge{font-family:'Orbitron';font-size:8px;font-weight:700;padding:2px 8px;letter-spacing:1px;animation:badgePulse 1s ease-in-out infinite}
+@keyframes badgePulse{0%,100%{box-shadow:0 0 6px currentColor}50%{box-shadow:0 0 16px currentColor}}
+.wa-close{background:none;border:none;color:rgba(0,212,255,.5);font-size:16px;cursor:pointer;padding:2px 6px;line-height:1;transition:.15s}
+.wa-close:hover{color:#ff3355}
+.wa-body{padding:12px 14px}
+.wa-market{font-size:9px;color:#dff0f8;line-height:1.4;margin-bottom:10px;padding:6px 9px;background:rgba(0,212,255,.05);border-left:2px solid rgba(0,212,255,.4)}
+.wa-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
+.wa-stat{background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.07);padding:7px 8px;text-align:center}
+.wa-stat-l{font-size:6px;color:var(--t3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:3px}
+.wa-stat-v{font-family:'Orbitron';font-size:12px;font-weight:900}
+.wa-action-row{display:flex;gap:8px;align-items:center}
+.wa-action-pill{font-family:'Orbitron';font-size:11px;font-weight:900;padding:6px 16px;border:1px solid;letter-spacing:1px;flex-shrink:0}
+.wa-outcome{font-size:8px;color:var(--t2);flex:1;line-height:1.4}
+.wa-footer{display:flex;align-items:center;justify-content:space-between;padding:7px 14px 9px;border-top:1px solid rgba(255,255,255,.05);background:rgba(0,0,0,.3)}
+.wa-wallet{font-size:7.5px;color:var(--cyan);letter-spacing:.5px}
+.wa-timer-bar{position:absolute;bottom:0;left:0;height:2px;background:linear-gradient(90deg,#00d4ff,#00ff88);transition:width .1s linear}
 /* ── TICKER ── */
 #ticker{height:20px;background:rgba(0,0,0,.75);border-bottom:1px solid var(--b1);
   overflow:hidden;display:flex;align-items:center;z-index:200;position:relative}
@@ -39,7 +74,16 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9998;
 .t-item{display:inline-flex;align-items:center;gap:5px;padding:0 14px;
   border-right:1px solid var(--b1);font-size:8.5px}
 .t-n{color:var(--t3)}.t-v{font-weight:700}.t-up{color:var(--green)}.t-dn{color:var(--red)}.t-fl{color:var(--t2)}
-
+#edge-modal-body .sig-card {
+  display:flex;
+  flex-direction:column;
+  height:auto;
+  min-height:220px;
+  overflow:visible;
+}
+#edge-modal-body .sig-card-body {
+  flex:1;
+}
 /* ── TOPBAR ── */
 #topbar{display:flex;align-items:center;height:43px;padding:0 14px;
   background:linear-gradient(90deg,#030a10,#06111c,#030a10);
@@ -108,7 +152,8 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9998;
 .edge-feed{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:5px;padding:6px}
 .edge-feed::-webkit-scrollbar{width:2px}.edge-feed::-webkit-scrollbar-thumb{background:var(--b2)}
 @keyframes sigIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-.sig-card{background:var(--bg3);border:1px solid var(--b1);border-left:3px solid;cursor:pointer;transition:background .15s;animation:sigIn .25s ease;overflow:hidden}
+/* AFTER: */
+.sig-card{background:var(--bg3);border:1px solid rgba(0,212,255,.12);border-left:3px solid;cursor:pointer;transition:background .15s;animation:sigIn .25s ease;overflow:hidden;border-radius:2px;box-shadow:0 2px 12px rgba(0,0,0,.4);flex-shrink:0;min-height:0;width:100%}
 .sig-card:hover{background:var(--bg4)}
 .sig-card-top{padding:8px 10px 6px;border-bottom:1px solid var(--b1)}
 .sig-card-body{padding:7px 10px;display:flex;flex-direction:column;gap:5px}
@@ -393,6 +438,57 @@ canvas{display:block;width:100%;height:100%}
 .s-break{background:rgba(155,93,229,.08);color:var(--purple);border:1px solid rgba(155,93,229,.25)}
 .final-call{border:1px solid;overflow:hidden;margin-top:6px}
 .s-neutral{background:rgba(107,143,168,.06);color:var(--t2);border:1px solid var(--b1)}
+/* ── UNLOCK BTN ── */
+#unlock-btn{font-family:'Orbitron';font-size:8px;font-weight:700;letter-spacing:1.5px;padding:4px 12px;cursor:pointer;border:1px solid var(--cyan);background:rgba(0,212,255,.08);color:var(--cyan);transition:.2s;white-space:nowrap;flex-shrink:0}
+#unlock-btn:hover{background:rgba(0,212,255,.2);box-shadow:0 0 10px rgba(0,212,255,.3)}
+#how-btn{font-family:'Orbitron';font-size:8px;font-weight:700;letter-spacing:1.5px;padding:4px 12px;cursor:pointer;border:1px solid var(--b2);background:none;color:var(--t2);transition:.2s;white-space:nowrap;flex-shrink:0}
+#how-btn:hover{border-color:var(--cyan);color:var(--cyan);background:rgba(0,212,255,.06)}
+#how-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:300000;align-items:center;justify-content:center}
+.how-content{width:960px;max-width:96vw;max-height:90vh;overflow-y:auto;background:#080d12;border:1px solid rgba(0,212,255,.25);padding:0;border-radius:4px}
+.how-content::-webkit-scrollbar{width:2px}.how-content::-webkit-scrollbar-thumb{background:rgba(0,212,255,.2)}
+.how-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.06);position:sticky;top:0;background:#080d12;z-index:1}
+.how-close{background:none;border:none;color:var(--t3);font-size:16px;cursor:pointer;padding:0 4px;line-height:1}
+.how-close:hover{color:var(--t1)}
+.how-section{padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.04)}
+.how-section:last-child{border-bottom:none}
+.how-tag{font-family:'Orbitron';font-size:7px;font-weight:700;letter-spacing:2px;padding:2px 7px;border:1px solid;margin-bottom:8px;display:inline-block}
+.how-title{font-family:'Orbitron';font-size:10px;font-weight:700;letter-spacing:1px;margin-bottom:6px}
+.how-body{font-size:8.5px;color:var(--t2);line-height:1.75}
+.how-arrow{color:var(--cyan);font-weight:700}
+.how-steps{display:flex;flex-direction:column;gap:6px;margin-top:4px}
+.how-step{display:flex;gap:9px;align-items:flex-start;font-size:8.5px;color:var(--t2)}
+.how-step-num{font-family:'Orbitron';font-size:8px;font-weight:700;color:var(--cyan);flex-shrink:0;min-width:16px}
+/* ── ACCESS MODAL ── */
+#access-modal{position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:200000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+#access-modal.show{display:flex}
+.am-card{background:var(--bg2);border:1px solid var(--b2);width:90%;max-width:480px;max-height:90vh;overflow-y:auto;box-shadow:0 0 40px rgba(0,212,255,.12);position:relative}
+.am-card::before{content:'';position:absolute;inset:-1px;pointer-events:none;background:linear-gradient(135deg,rgba(0,212,255,.07),transparent 55%,rgba(0,255,136,.05))}
+.am-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--b1);position:sticky;top:0;background:var(--bg2);z-index:1}
+.am-title{font-family:'Orbitron';font-size:11px;font-weight:900;letter-spacing:2px;color:var(--cyan)}
+.am-close{background:none;border:none;color:var(--t3);font-size:16px;cursor:pointer;padding:0 4px}
+.am-close:hover{color:var(--t1)}
+.am-tabs{display:flex;border-bottom:1px solid var(--b1)}
+.am-tab{flex:1;padding:9px;font-family:'Orbitron';font-size:8px;letter-spacing:1.5px;cursor:pointer;text-align:center;color:var(--t3);border:none;background:none;border-bottom:2px solid transparent;transition:.15s}
+.am-tab.active{color:var(--cyan);border-bottom-color:var(--cyan);background:rgba(0,212,255,.04)}
+.am-tab:hover:not(.active){color:var(--t2)}
+.am-pane{padding:18px;display:none}
+.am-pane.active{display:block}
+.am-section-label{font-size:7px;color:var(--t3);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--b1)}
+.am-addr-box{background:var(--bg3);border:1px solid var(--b2);padding:10px 12px;display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.am-network{font-size:7.5px;color:var(--t3);letter-spacing:1px;margin-bottom:3px}
+.am-addr{font-family:'JetBrains Mono';font-size:9px;color:var(--cyan);word-break:break-all;flex:1;line-height:1.4}
+.am-copy{background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.25);color:var(--cyan);font-family:'Orbitron';font-size:7px;padding:4px 8px;cursor:pointer;white-space:nowrap;transition:.15s;flex-shrink:0}
+.am-copy:hover{background:rgba(0,212,255,.2)}.am-copy.copied{color:var(--green);border-color:rgba(0,255,136,.4)}
+.am-box{font-size:8.5px;color:var(--t2);line-height:1.8;background:rgba(0,0,0,.3);border:1px solid var(--b1);border-left:3px solid var(--yellow);padding:11px 13px}
+.am-note{font-size:7.5px;color:var(--t3);text-align:center;margin-top:8px;line-height:1.6}
+.am-submit{width:100%;border:1px solid var(--b2);color:var(--t1);font-family:'Orbitron';font-size:9px;font-weight:700;letter-spacing:1.5px;padding:10px;cursor:pointer;transition:.2s;background:none}
+.am-submit:hover{background:rgba(255,255,255,.05)}
+.am-lic-wrap{display:flex;gap:6px;margin-bottom:10px}
+.am-lic-input{flex:1;background:var(--bg3);border:1px solid var(--b2);color:var(--t1);font-family:'JetBrains Mono';font-size:11px;padding:9px 12px;outline:none;letter-spacing:.5px}
+.am-lic-input:focus{border-color:var(--cyan)}.am-lic-input::placeholder{color:var(--t3);font-size:9px}
+.am-lic-btn{background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.4);color:var(--cyan);font-family:'Orbitron';font-size:8px;font-weight:700;letter-spacing:1px;padding:9px 14px;cursor:pointer;transition:.2s;white-space:nowrap}
+.am-lic-btn:hover{background:rgba(0,212,255,.22)}
+#main.blurred{filter:blur(6px) brightness(.6);pointer-events:none;user-select:none}
 </style>
 </head>
 <body>
@@ -401,7 +497,7 @@ canvas{display:block;width:100%;height:100%}
 
 <!-- TOPBAR -->
 <div id="topbar">
-  <div class="logo"><div class="logo-dot"></div> WHALE.TERMINAL <span class="logo-v">v4.0</span></div>
+  <div class="logo"><div class="logo-dot"></div> 🐋 WHALE.TERMINAL <span class="logo-v">v4.0</span></div>
   <div class="top-stats">
     <div class="tsg"><span class="tsl">EQUITY</span><span class="tsv" id="eq-top">$10,000</span></div>
     <div class="tsg"><span class="tsl">P&L 24H</span><span class="tsv g" id="pnl-top">+$0</span></div>
@@ -416,6 +512,9 @@ canvas{display:block;width:100%;height:100%}
   <div class="top-right">
     <div class="pill"><div class="sdot live-dot"></div> <span id="feed-source">CONNECTING…</span></div>
     <div class="pill"><div class="sdot warn-dot"></div> REAL CLOB</div>
+    <button id="sound-btn" onclick="toggleSound(this)" style="font-family:'Orbitron';font-size:8px;font-weight:700;letter-spacing:1.5px;padding:4px 12px;cursor:pointer;border:1px solid rgba(0,255,136,.3);background:rgba(0,255,136,.06);color:#00ff88;transition:.2s;white-space:nowrap;flex-shrink:0">🔊 SOUND</button>
+    <button id="how-btn" onclick="openHow()">❓ HOW IT WORKS</button>
+    <button id="unlock-btn" onclick="openAccessModal('license')">🔑 UNLOCK ACCESS</button>
     <div id="trial-wrap">
       <span id="trial-label">TRIAL</span>
       <div id="trial-track"><div id="trial-fill"></div></div>
@@ -477,7 +576,7 @@ canvas{display:block;width:100%;height:100%}
     <div class="pt"><span class="pta">▶</span> LIVE TRADES <span class="badge c" id="feed-badge">0</span></div>
     <div class="pc"><span style="font-size:7px;color:var(--t3)" id="feed-source-small">—</span></div>
   </div>
-  <div class="scroll" style="flex:0 0 200px">
+  <div class="scroll" style="flex:1">
     <table class="tt">
       <thead><tr>
         <th>TIME</th><th>WALLET</th><th>BET</th><th>ACT</th><th>SIZE</th><th>¢</th>
@@ -519,7 +618,7 @@ canvas{display:block;width:100%;height:100%}
     </div>
 
     <!-- POSITION PRESSURE panel -->
-    <div id="pos-pressure" style="border-top:1px solid var(--b1);background:rgba(6,13,20,.95);padding:6px 10px;display:flex;flex-direction:column;gap:5px">
+    <div id="pos-pressure" style="border-top:1px solid var(--b1);background:rgba(6,13,20,.95);padding:14px 10px;display:flex;flex-direction:column;gap:10px">
 
       <!-- Header row -->
       <div style="display:flex;align-items:center;justify-content:space-between">
@@ -561,8 +660,7 @@ canvas{display:block;width:100%;height:100%}
     </div>
   </div>
 
-  <!-- Active market: price chart + 4-sided CLOB + execution -->
- <!-- Active market: pressure map + OHLC + execution -->
+  <!-- Active market: pressure map + whale battlefield -->
   <div class="mkt-section" style="flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden">
     <div class="mkt-hdr">
       <span class="mkt-name" id="active-mkt-name">SELECT A MARKET OR SIGNAL…</span>
@@ -571,24 +669,25 @@ canvas{display:block;width:100%;height:100%}
     </div>
 
     <!-- MARKET PRESSURE MAP -->
-    <div style="border-bottom:1px solid var(--b1);position:relative;flex:0 0 280px;min-height:0;overflow:hidden">
+    <div style="border-bottom:1px solid var(--b1);position:relative;flex:0 0 150px;min-height:0;overflow:hidden">
       <div style="position:absolute;top:4px;left:9px;z-index:10;display:flex;align-items:center;gap:8px">
         <span style="font-family:'Orbitron';font-size:6.5px;font-weight:700;letter-spacing:2px;color:var(--t3)">MARKET PRESSURE MAP</span>
         <span id="hm-hover-info" style="font-size:6.5px;color:var(--cyan);opacity:0;transition:opacity .2s"></span>
       </div>
-      <!-- Right legend -->
-      <div style="position:absolute;right:6px;top:16px;bottom:8px;width:7px;border-radius:3px;overflow:hidden;z-index:10;display:flex;flex-direction:column">
-        <div style="flex:1;background:linear-gradient(180deg,#00ff88,#00ff8855,#1a3322,#33001188,#ff3355)"></div>
-      </div>
-      <div style="position:absolute;right:14px;top:14px;font-size:5.5px;color:#00ff8899;letter-spacing:.5px">BULL</div>
-      <div style="position:absolute;right:14px;bottom:8px;font-size:5.5px;color:#ff335599;letter-spacing:.5px">BEAR</div>
-      <canvas id="pressure-map-canvas" style="width:100%;height:100%;display:block"></canvas>
+      <canvas id="pressure-map-canvas" style="width:100%;height:100%;display:block;cursor:grab"></canvas>
     </div>
 
-    <!-- OHLC Candlestick chart — enlarged -->
-    <div style="flex:0 0 100px;border-bottom:1px solid var(--b1);position:relative;overflow:hidden">
-      <div style="position:absolute;top:3px;left:9px;font-family:'Orbitron';font-size:6px;letter-spacing:1.5px;color:var(--t3);z-index:5">PRICE · OHLC</div>
-      <canvas id="price-chart-canvas" style="width:100%;height:100%"></canvas>
+    <!-- WHALE BATTLEFIELD -->
+    <div style="flex:1;min-height:0;position:relative;overflow:hidden;background:linear-gradient(180deg,#020c14,#030a10);display:flex;flex-direction:column">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 10px;border-bottom:1px solid rgba(0,212,255,.08);flex-shrink:0">
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="font-size:9px">🐋</span>
+          <span style="font-family:'Orbitron';font-size:6.5px;font-weight:700;letter-spacing:2px;color:rgba(0,212,255,.55)">WHALE BATTLEFIELD</span>
+          <span style="font-size:6px;color:var(--t3)">bubble size = trade volume</span>
+        </div>
+        <span id="wb-live" style="font-size:6px;color:rgba(0,255,136,.5);letter-spacing:1px">LIVE</span>
+      </div>
+      <canvas id="whale-battle-canvas" style="width:100%;flex:1;display:block;min-height:0;cursor:crosshair"></canvas>
     </div>
 
     <!-- Execution -->
@@ -684,7 +783,8 @@ canvas{display:block;width:100%;height:100%}
     </div>
   </div>
   <div id="edge-modal-summary" style="display:flex;border-bottom:1px solid rgba(255,255,255,.06)"></div>
-  <div id="edge-modal-body" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1px;overflow-y:auto;flex:1;background:rgba(255,255,255,.04);padding:1px"></div>
+  <div id="edge-modal-body" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;overflow-y:auto;flex:1;background:var(--bg);padding:16px;align-content:start"></div>
+
 </div>
 
 
@@ -728,60 +828,123 @@ canvas{display:block;width:100%;height:100%}
   </div>
 </div>
 
-<!-- PAYWALL (keep for plan selection) -->
-<div id="paywall">
-  <div class="pw-card">
-    <span class="pw-whale">🐋</span>
-    <div class="pw-title">UPGRADE TO CONTINUE</div>
-    <div class="pw-sub">
-      You've tracked live Polymarket whale trades, real CLOB order books,<br>
-      and 8-signal intelligence. <strong style="color:var(--cyan)">Don't lose your edge.</strong>
+<!-- ACCESS MODAL (payment + license) -->
+<div id="access-modal">
+  <div class="am-card">
+    <div class="am-header">
+      <div class="am-title">🐋 WHALE.TERMINAL — ACCESS</div>
+      <button class="am-close" onclick="closeAccessModal()" id="am-close-btn">✕</button>
     </div>
-    <div class="pw-stats">
-      <div class="pw-stat"><div class="pw-stat-v" id="pw-trades">0</div><div class="pw-stat-l">TRADES SEEN</div></div>
-      <div class="pw-stat"><div class="pw-stat-v" id="pw-vol">$0</div><div class="pw-stat-l">VOL TRACKED</div></div>
-      <div class="pw-stat"><div class="pw-stat-v" id="pw-whales">0</div><div class="pw-stat-l">WHALES SPOTTED</div></div>
+    <div class="am-tabs">
+      <button class="am-tab active" id="am-tab-license" onclick="switchAmTab('license')">🔑 ENTER LICENSE</button>
+      <button class="am-tab" id="am-tab-buy" onclick="switchAmTab('buy')">💳 BUY ACCESS</button>
     </div>
-    <div class="pw-plans">
-      <div class="pw-plan" id="plan-m" onclick="selectPlan('monthly')">
-        <div class="pw-plan-period">MONTHLY</div>
-        <div class="pw-plan-p" style="color:var(--cyan)">$35</div>
-        <div class="pw-plan-save">&nbsp;</div>
+
+    <!-- LICENSE PANE -->
+    <div class="am-pane active" id="am-pane-license">
+      <div class="am-section-label">Your License Key</div>
+      <div class="am-warn-banner" id="am-warn-banner">
+        ⚠ Key active on multiple devices. Sharing your key may cause revocation.
       </div>
-      <div class="pw-plan pop sel" id="plan-y" onclick="selectPlan('yearly')">
-        <div class="pop-badge">BEST VALUE — SAVE $40</div>
-        <div class="pw-plan-period">YEARLY</div>
-        <div class="pw-plan-p" style="color:var(--green)">$380</div>
-        <div class="pw-plan-save">≈ $31.67 / month</div>
+      <div class="am-lic-input-wrap">
+        <input class="am-lic-input" id="lic-input" placeholder="Whale-PRO-YYYY-MM-DD-XXXXXX" autocomplete="off" spellcheck="false">
+        <button class="am-lic-btn" onclick="_licActivate()">ACTIVATE</button>
       </div>
+      <div class="am-lic-status" id="lic-status">Enter your key above and press Activate.</div>
+      <div class="am-or-divider">OR</div>
+      <div style="font-size:8.5px;color:var(--t2);line-height:1.7;text-align:center;margin-bottom:10px">
+        No key yet? Buy access below — crypto only, no KYC, no account.
+      </div>
+      <button class="am-submit" onclick="switchAmTab('buy')" style="background:linear-gradient(90deg,rgba(0,255,136,.12),rgba(0,212,255,.08));border-color:rgba(0,255,136,.3);color:var(--green)">
+        ▶ BUY ACCESS (CRYPTO · NO KYC)
+      </button>
     </div>
-    <div class="pw-feats">
-      <div class="pw-feat"><span class="ck">✓</span> Unlimited real-time Polymarket whale trades (all $100+ txns)</div>
-      <div class="pw-feat"><span class="ck">✓</span> 8 proprietary signals: Cluster, Velocity, Reversal, Divergence…</div>
-      <div class="pw-feat"><span class="ck">✓</span> Live 4-sided CLOB order books per outcome (BUY/SELL × each)</div>
-      <div class="pw-feat"><span class="ck">✓</span> Whale score formula — rank wallets by real edge</div>
-      <div class="pw-feat"><span class="ck">✓</span> Monthly + all-time leaderboard from Polymarket Data API</div>
-      <div class="pw-feat"><span class="ck">✓</span> One-click trade execution redirect to Polymarket</div>
+
+    <!-- BUY PANE -->
+    <div class="am-pane" id="am-pane-buy">
+      <div class="am-section-label">Choose Plan</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
+        <div id="am-plan-monthly" onclick="selectAmPlan('monthly')" style="padding:10px;cursor:pointer;border:1px solid var(--b1);transition:.2s;background:none">
+          <div style="font-size:7px;color:var(--t3);letter-spacing:1.5px;margin-bottom:4px">MONTHLY</div>
+          <div style="font-family:'Orbitron';font-size:20px;font-weight:900;color:var(--cyan)">$35</div>
+        </div>
+        <div id="am-plan-yearly" onclick="selectAmPlan('yearly')" style="padding:10px;cursor:pointer;border:1px solid var(--cyan);background:rgba(0,212,255,.05);transition:.2s;position:relative">
+          <div style="position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:var(--green);color:var(--bg);font-size:6.5px;font-weight:700;padding:1px 8px;white-space:nowrap">BEST VALUE</div>
+          <div style="font-size:7px;color:var(--t3);letter-spacing:1.5px;margin-bottom:4px">YEARLY</div>
+          <div style="font-family:'Orbitron';font-size:20px;font-weight:900;color:var(--green)">$380</div>
+          <div style="font-size:7px;color:var(--yellow)">≈ $31.67/mo · save $40</div>
+        </div>
+      </div>
+
+      <div class="am-section-label">Send Payment To</div>
+      <div id="am-addr-list"><div style="color:var(--t3);font-size:8px;padding:8px">Loading…</div></div>
+
+      <div class="am-box" style="margin-top:14px;margin-bottom:14px">
+        <div style="font-family:'Orbitron';font-size:8px;font-weight:700;letter-spacing:2px;color:var(--yellow);margin-bottom:8px">HOW TO GET ACCESS</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;gap:8px;align-items:flex-start">
+            <span style="color:var(--cyan);font-weight:700;flex-shrink:0">1.</span>
+            <span>Send USDT to one of the addresses above <span style="color:var(--yellow)">(TRC20 recommended for low fees)</span></span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:flex-start">
+            <span style="color:var(--cyan);font-weight:700;flex-shrink:0">2.</span>
+            <span>Copy your transaction hash (TX ID)</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:flex-start">
+            <span style="color:var(--cyan);font-weight:700;flex-shrink:0">3.</span>
+            <span>Message me on Telegram and send: <span style="color:var(--t1)">• TX hash</span></span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:flex-start">
+            <span style="color:var(--cyan);font-weight:700;flex-shrink:0">4.</span>
+            <span>You will receive your license key within <span style="color:var(--green);font-weight:700">5–30 minutes</span></span>
+          </div>
+        </div>
+        <div style="margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,.06);font-size:7.5px;color:var(--t3);line-height:1.7">
+          <span style="color:var(--red);font-weight:700">IMPORTANT</span>
+          &nbsp;•&nbsp;Send exact amount
+          &nbsp;•&nbsp;Use correct network (TRC20 or ERC20)
+          &nbsp;•&nbsp;Double-check address before sending
+        </div>
+      </div>
+
+      <div style="background:rgba(0,212,255,.05);border:1px solid rgba(0,212,255,.25);padding:12px 14px;margin-bottom:10px;text-align:center">
+        <div style="font-size:7.5px;color:var(--t3);letter-spacing:1px;margin-bottom:4px;text-transform:uppercase">Contact &amp; Support</div>
+        <div style="font-family:'Orbitron';font-size:12px;font-weight:900;color:var(--cyan);letter-spacing:1px;margin-bottom:4px">@Rust0xDev</div>
+        <div style="font-size:8px;color:var(--t2);margin-bottom:10px">Click below to open Telegram and send your TX hash after payment.</div>
+        <a href="https://t.me/Rust0xDev" target="_blank" rel="noopener noreferrer"
+           style="display:block;width:100%;box-sizing:border-box;background:linear-gradient(90deg,rgba(0,212,255,.18),rgba(0,255,136,.1));border:1px solid rgba(0,212,255,.45);color:var(--cyan);font-family:'Orbitron';font-size:9px;font-weight:700;letter-spacing:1.5px;padding:11px;text-decoration:none;text-align:center;transition:.2s"
+           onmouseover="this.style.background='linear-gradient(90deg,rgba(0,212,255,.28),rgba(0,255,136,.18))'"
+           onmouseout="this.style.background='linear-gradient(90deg,rgba(0,212,255,.18),rgba(0,255,136,.1))'">
+          ✈ OPEN TELEGRAM — @Rust0xDev
+        </a>
+      </div>
+      <div class="am-note">After sending payment, message your TX hash on Telegram. Key delivered within 5–30 minutes.</div>
     </div>
-    <button class="pw-btn" id="pw-btn" onclick="checkout()">UNLOCK FULL ACCESS — $380/yr ▶</button>
-    <div class="pw-note">Cancel anytime · Instant access · Stripe secured</div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS MODAL -->
+<div id="how-modal" onclick="if(event.target===this)closeHow()">
+  <div class="how-content">
+    <div class="how-header">
+      <div style="font-family:'Orbitron';font-size:10px;font-weight:900;letter-spacing:2.5px;color:var(--cyan)">HOW IT WORKS</div>
+      <button class="how-close" onclick="closeHow()">✕</button>
+    </div>
+    <div id="how-body"></div>
   </div>
 </div>
 
 <!-- REDIRECT MODAL -->
-<div id="modal-overlay">
-  <div class="modal">
-    <div class="modal-title">EXTERNAL REDIRECT</div>
-    <div class="modal-body" id="modal-msg">Opening Polymarket. Proceed?</div>
-    <div class="modal-btns">
-      <button class="mbtn mbtn-s" onclick="closeModal()">CANCEL</button>
-      <button class="mbtn mbtn-p" id="modal-confirm">PROCEED</button>
-    </div>
-  </div>
-</div>
 
 <script>
 'use strict';
+// API endpoint - works with file:// protocol, localhost server, or production
+const API = (() => {
+  const host = window.location.hostname;
+  if (!host || host === '') return 'http://localhost:8080'; // file:// protocol
+  if (host === 'localhost' || host === '127.0.0.1') return 'http://localhost:8080';
+  return window.BACKEND_URL || 'https://whale-terminal-backend.onrender.com';
+})();
 // ═══ STATE ═══════════════════════════════════════════════════════
 let TRADES=[], MARKETS=[], WHALES=[], SIGNALS={}, STATS={}, ORDER_BOOKS={}, EDGE_SIGNALS=[];
 let feedPaused=false, whaleOnly=false, alertCount=0;
@@ -794,8 +957,8 @@ let activeMktIdx=0, activeQty=100, ws;
 
 // ═══ WEBSOCKET ════════════════════════════════════════════════════
 function connect() {
-  const proto = location.protocol==='https:'?'wss://':'ws://';
-  ws = new WebSocket(proto + location.host + '/ws');
+  const wsUrl = API.replace('http://', 'ws://').replace('https://', 'wss://') + '/ws';
+  ws = new WebSocket(wsUrl);
   ws.onopen = () => {
     const el = document.getElementById('feed-source');
     if(el){ el.textContent='POLYMARKET LIVE'; el.style.color='var(--green)'; }
@@ -897,6 +1060,8 @@ function onTrade(t) {
   drawEquity(); updateEquityUI();
 
   ingestPressure(t);
+  // 5K+ whale alert
+  if (t.size_usd >= 5000) showWhaleAlert(t);
   if (pressureData.length) drawPressureMap();
   if(feedPaused) return;
   if(whaleOnly && !t.is_whale) return;
@@ -1010,18 +1175,31 @@ function onSignals(s) {
 // Stats fields: total_volume_24h, active_wallets, open_markets,
 //               total_trades_seen, biggest_trade, buy_sell_ratio,
 //               whale_count, signals_fired_today, alpha_wallet_count
+// AFTER:
 function onStats(s) {
   STATS = s;
   const set = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
-  set('wr-top',   s.win_rate_avg ? s.win_rate_avg.toFixed(1)+'%' : '—');
+
+  // WIN RATE: from server, else compute avg from WHALES array
+  let wr = s.win_rate_avg;
+  if (!wr && WHALES.length) {
+    const valid = WHALES.filter(w => w.win_rate && w.win_rate !== 50);
+    wr = valid.length ? valid.reduce((a,w) => a + w.win_rate, 0) / valid.length : null;
+  }
+  set('wr-top', wr ? wr.toFixed(1)+'%' : '—');
+
+  // ALPHA WALLETS: from server, else count high-score whales (score > 70)
+  const alphaCount = s.alpha_wallet_count ||
+    WHALES.filter(w => (w.whale_score||0) > 70).length || '—';
+  set('alpha-top', alphaCount);
+
   set('vol-top',  fmt(s.total_volume_24h));
-  set('wh-top',   s.whale_count || s.active_wallets || '—');
+  set('wh-top',   s.whale_count || s.active_wallets || WHALES.length || '—');
   set('big-top',  fmt(s.biggest_trade));
   set('big-trade',fmt(s.biggest_trade));
   set('open-mkts',s.open_markets||'—');
   set('tc-top',   s.total_trades_seen||TRADES.length);
   set('hdr-vol',  fmt(s.total_volume_24h));
-  set('alpha-top',s.alpha_wallet_count||'—');
   const bsr = (s.buy_sell_ratio||1).toFixed(2)+'x';
   set('bsr-top',bsr); set('bsr-mid',bsr); set('bsr-ratio',bsr);
   updateBSR();
@@ -1492,139 +1670,194 @@ function drawPressureMap() {
   const ctx = canvas.getContext('2d');
   ctx.scale(dpr, dpr);
 
-  const ROWS = 18, COLS = pressureData.length || 1;
-  const cw = (W - 16) / COLS, rh = H / ROWS;
-
-  // Find max pressure for normalisation
-  let maxP = 1;
-  pressureData.forEach(d => { maxP = Math.max(maxP, d.buy, d.sell); });
-
-  // Draw heatmap cells
-  for (let ci = 0; ci < pressureData.length; ci++) {
-    const d   = pressureData[ci];
-    const buyN  = d.buy  / maxP;   // 0-1
-    const sellN = d.sell / maxP;
-    const x = ci * cw;
-
-    for (let ri = 0; ri < ROWS; ri++) {
-      // Row 0 = top = bull pressure zone, row ROWS-1 = bear
-      const rowFrac = ri / (ROWS - 1);   // 0=top,1=bottom
-      // Bull cells respond to buyN (top rows), bear to sellN (bottom rows)
-      const bullW  = Math.max(0, buyN  * (1 - rowFrac) * 2);
-      const bearW  = Math.max(0, sellN * rowFrac * 2);
-      const net    = bullW - bearW;      // positive=green, negative=red
-
-      let r, g, b, a;
-      if (net > 0) {
-        const t = Math.min(1, net);
-        r = Math.round(0   + t * 0);
-        g = Math.round(40  + t * 215);
-        b = Math.round(30  + t * 30);
-        a = 0.08 + t * 0.55;
-      } else {
-        const t = Math.min(1, -net);
-        r = Math.round(40  + t * 215);
-        g = Math.round(0);
-        b = Math.round(20  + t * 35);
-        a = 0.08 + t * 0.50;
-      }
-
-      ctx.fillStyle = `rgba(${r},${g},${b},${a})`;
-      // Slight glow on hot cells
-      if (a > 0.45) {
-        ctx.shadowColor  = net > 0 ? 'rgba(0,255,136,.4)' : 'rgba(255,51,85,.4)';
-        ctx.shadowBlur   = 4;
-      } else {
-        ctx.shadowBlur = 0;
-      }
-      ctx.fillRect(x, ri * rh, cw - 0.5, rh - 0.5);
-    }
+  const PAD = { l: 32, r: 16, t: 10, b: 18 };
+  const cW = W - PAD.l - PAD.r;
+  const cH = H - PAD.t - PAD.b;
+  const data = pressureData;
+  if (!data.length) {
+    ctx.fillStyle = 'rgba(94,132,158,.3)';
+    ctx.font = '8px JetBrains Mono';
+    ctx.textAlign = 'center';
+    ctx.fillText('AWAITING DATA…', W/2, H/2);
+    return;
   }
-  ctx.shadowBlur = 0;
 
-  // Draw grid lines (subtle)
-  ctx.strokeStyle = 'rgba(0,0,0,.25)';
-  ctx.lineWidth   = 0.4;
-  for (let ri = 1; ri < ROWS; ri++) { ctx.beginPath(); ctx.moveTo(0, ri*rh); ctx.lineTo(W-16, ri*rh); ctx.stroke(); }
+  const prices = data.map(d => d.price);
+  const minP = Math.min(...prices) - 2;
+  const maxP = Math.max(...prices) + 2;
+  const pRange = maxP - minP || 1;
+  const py = p => PAD.t + cH - ((p - minP) / pRange) * cH;
+  const _off = window._pmOffset || 0;
+const px = i => PAD.l + (i / (data.length - 1 || 1)) * cW - _off;
+  const maxVol = Math.max(...data.map(d => Math.max(d.buy, d.sell)), 1);
 
-  // Price line overlay
-  if (pressureData.length >= 2) {
-    const prices = pressureData.map(d => d.price);
-    const minP   = Math.min(...prices) - 1;
-    const maxPr  = Math.max(...prices) + 1;
-    const pRange = maxPr - minP || 1;
-    const py = p => H - ((p - minP) / pRange) * (H - 12) - 6;
+  // BG
+  ctx.fillStyle = '#000000';
+  ctx.fillRect(0, 0, W, H);
 
-    // Glow pass
+  // Grid lines + price labels
+  const priceSteps = 4;
+  for (let s = 0; s <= priceSteps; s++) {
+    const p = minP + (pRange * s / priceSteps);
+    const y = py(p);
+    ctx.strokeStyle = 'rgba(0,212,255,.07)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([3, 5]);
+    ctx.beginPath(); ctx.moveTo(PAD.l, y); ctx.lineTo(W - PAD.r, y); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = 'rgba(94,132,158,.55)';
+    ctx.font = '6px JetBrains Mono';
+    ctx.textAlign = 'right';
+    ctx.fillText(p.toFixed(0) + '¢', PAD.l - 3, y + 2);
+  }
+
+  // Vertical time separators
+  const tStep = Math.max(1, Math.floor(data.length / 6));
+  data.forEach((d, i) => {
+    if (i % tStep === 0 && i > 0) {
+      const x = px(i);
+      ctx.strokeStyle = 'rgba(0,212,255,.05)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([2, 4]);
+      ctx.beginPath(); ctx.moveTo(x, PAD.t); ctx.lineTo(x, H - PAD.b); ctx.stroke();
+      ctx.setLineDash([]);
+    }
+  });
+
+  // Trade bubbles (buy=green, sell=red), sized by volume
+  // Trade bubbles — improved with inner glow + ring
+  data.forEach((d, i) => {
+    const x = px(i);
+    const y = py(d.price);
+    const maxR = Math.min(cH * 0.28, 18);
+
+    function drawBubble(cx, cy, r, baseColor, glowColor) {
+      // outer glow ring
+      ctx.beginPath(); ctx.arc(cx, cy, r + 3, 0, Math.PI*2);
+      ctx.strokeStyle = baseColor.replace(/[\d.]+\)$/, '0.15)');
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // fill with radial gradient
+      const grad = ctx.createRadialGradient(cx - r*0.3, cy - r*0.3, r*0.1, cx, cy, r);
+      grad.addColorStop(0, baseColor.replace(/[\d.]+\)$/, '0.55)'));
+      grad.addColorStop(0.6, baseColor.replace(/[\d.]+\)$/, '0.22)'));
+      grad.addColorStop(1, baseColor.replace(/[\d.]+\)$/, '0.04)'));
+      ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2);
+      ctx.fillStyle = grad;
+      ctx.shadowColor = glowColor; ctx.shadowBlur = r * 1.8;
+      ctx.fill(); ctx.shadowBlur = 0;
+
+      // sharp border
+      ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2);
+      ctx.strokeStyle = baseColor.replace(/[\d.]+\)$/, '0.85)');
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+
+      // highlight specular
+      ctx.beginPath(); ctx.arc(cx - r*0.28, cy - r*0.28, r*0.22, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(255,255,255,0.18)';
+      ctx.fill();
+    }
+
+    if (d.buy > 0) {
+      const r = Math.max(3.5, (d.buy / maxVol) * maxR);
+      drawBubble(x, y - r * 0.55, r, 'rgba(0,255,136,0.35)', '#00FF88');
+    }
+    if (d.sell > 0) {
+      const r = Math.max(3.5, (d.sell / maxVol) * maxR);
+      drawBubble(x, y + r * 0.55, r, 'rgba(255,51,85,0.35)', '#FF3355');
+    }
+  });
+
+  // Price line glow
+  if (data.length >= 2) {
     ctx.beginPath();
-    pressureData.forEach((d, i) => {
-      const x = i * cw + cw / 2;
-      i === 0 ? ctx.moveTo(x, py(d.price)) : ctx.lineTo(x, py(d.price));
-    });
-    ctx.strokeStyle = 'rgba(255,255,255,.18)';
-    ctx.lineWidth   = 4;
-    ctx.shadowColor = 'rgba(255,255,255,.6)';
-    ctx.shadowBlur  = 8;
+    data.forEach((d, i) => { i===0 ? ctx.moveTo(px(i), py(d.price)) : ctx.lineTo(px(i), py(d.price)); });
+    ctx.strokeStyle = 'rgba(255,255,255,.15)';
+    ctx.lineWidth = 5;
+    ctx.shadowColor = 'rgba(255,255,255,.5)';
+    ctx.shadowBlur = 10;
     ctx.stroke();
 
-    // Sharp line
+    // Price line sharp
     ctx.beginPath();
-    pressureData.forEach((d, i) => {
-      const x = i * cw + cw / 2;
-      i === 0 ? ctx.moveTo(x, py(d.price)) : ctx.lineTo(x, py(d.price));
-    });
-    ctx.strokeStyle = 'rgba(255,255,255,.92)';
-    ctx.lineWidth   = 1.4;
-    ctx.shadowColor = 'rgba(255,255,255,.8)';
-    ctx.shadowBlur  = 5;
+    data.forEach((d, i) => { i===0 ? ctx.moveTo(px(i), py(d.price)) : ctx.lineTo(px(i), py(d.price)); });
+    ctx.strokeStyle = 'rgba(255,255,255,.9)';
+    ctx.lineWidth = 1.5;
+    ctx.shadowColor = '#fff';
+    ctx.shadowBlur = 4;
     ctx.stroke();
-    ctx.shadowBlur  = 0;
+    ctx.shadowBlur = 0;
 
     // Live dot
-    const last = pressureData[pressureData.length - 1];
-    const lx   = (pressureData.length - 1) * cw + cw / 2;
-    const ly   = py(last.price);
-    ctx.beginPath(); ctx.arc(lx, ly, 2.8, 0, Math.PI*2);
-    ctx.fillStyle   = '#ffffff';
-    ctx.shadowColor = 'rgba(255,255,255,.9)';
-    ctx.shadowBlur  = 8;
-    ctx.fill();
-    ctx.shadowBlur  = 0;
+    const last = data[data.length - 1];
+    const lx = px(data.length - 1), ly = py(last.price);
+    ctx.beginPath(); ctx.arc(lx, ly, 3.5, 0, Math.PI*2);
+    ctx.fillStyle = '#fff';
+    ctx.shadowColor = '#fff'; ctx.shadowBlur = 10;
+    ctx.fill(); ctx.shadowBlur = 0;
   }
 
-  // X-axis time ticks (bottom, subtle)
-  const step = Math.max(1, Math.floor(pressureData.length / 5));
-  ctx.fillStyle   = 'rgba(94,132,158,.5)';
-  ctx.font        = '5.5px JetBrains Mono';
-  ctx.textAlign   = 'center';
-  pressureData.forEach((d, i) => {
-    if (i % step === 0) {
-      const x  = i * cw + cw / 2;
+  // X-axis time labels
+  ctx.fillStyle = 'rgba(94,132,158,.5)';
+  ctx.font = '5.5px JetBrains Mono';
+  ctx.textAlign = 'center';
+  data.forEach((d, i) => {
+    if (i % tStep === 0) {
       const dt = new Date(d.ts);
-      ctx.fillText(`${dt.getHours()}:${String(dt.getMinutes()).padStart(2,'0')}`, x, H - 1);
+      ctx.fillText(`${dt.getHours()}:${String(dt.getMinutes()).padStart(2,'0')}`, px(i), H - 2);
     }
   });
 }
-
 // Hover handler for pressure map
 function initPressureHover() {
   const canvas = document.getElementById('pressure-map-canvas');
   const info   = document.getElementById('hm-hover-info');
   if (!canvas || !info) return;
-  canvas.onmousemove = e => {
+
+  let isDragging = false, startX = 0, startOffset = 0;
+  if (!window._pmOffset) window._pmOffset = 0;   // pan offset in data-index units
+
+  function getIdx(clientX) {
     const rect = canvas.getBoundingClientRect();
-    const x    = e.clientX - rect.left;
-    const cw   = (rect.width - 16) / (pressureData.length || 1);
-    const idx  = Math.min(pressureData.length - 1, Math.floor(x / cw));
-    const d    = pressureData[idx];
-    if (!d) return;
-    const net  = d.buy - d.sell;
-    const dt   = new Date(d.ts);
-    info.style.opacity = '1';
-    info.textContent   = `${dt.getHours()}:${String(dt.getMinutes()).padStart(2,'0')} · ${net >= 0 ? '↑ BUY' : '↓ SELL'} $${Math.abs(net/1000).toFixed(1)}K · ${d.price.toFixed(1)}¢`;
-    info.style.color   = net >= 0 ? '#00ff88' : '#ff3355';
+    const x = clientX - rect.left - 16 + window._pmOffset;
+    const cw = (rect.width - 48) / (pressureData.length || 1);
+    return Math.min(pressureData.length - 1, Math.max(0, Math.floor(x / cw)));
+  }
+
+  canvas.onmousedown = e => {
+    isDragging = true;
+    startX = e.clientX;
+    startOffset = window._pmOffset;
+    canvas.style.cursor = 'grabbing';
   };
-  canvas.onmouseleave = () => { info.style.opacity = '0'; };
+
+  canvas.onmousemove = e => {
+    if (isDragging) {
+      const rect = canvas.getBoundingClientRect();
+      const cw = (rect.width - 48) / (pressureData.length || 1);
+      window._pmOffset = Math.max(0, Math.min(
+        pressureData.length * cw - rect.width + 48,
+        startOffset - (e.clientX - startX)
+      ));
+      drawPressureMap();
+    } else {
+      const idx = getIdx(e.clientX);
+      const d = pressureData[idx];
+      if (!d) return;
+      const net = d.buy - d.sell;
+      const dt = new Date(d.ts);
+      info.style.opacity = '1';
+      info.textContent = `${dt.getHours()}:${String(dt.getMinutes()).padStart(2,'0')} · ${net >= 0 ? '↑ BUY' : '↓ SELL'} $${Math.abs(net/1000).toFixed(1)}K · ${d.price.toFixed(1)}¢`;
+      info.style.color = net >= 0 ? '#00ff88' : '#ff3355';
+    }
+  };
+
+  canvas.onmouseup = canvas.onmouseleave = e => {
+    if (isDragging) { isDragging = false; canvas.style.cursor = 'crosshair'; }
+    else { if(info) info.style.opacity = '0'; }
+  };
 }
 
 // Stub — CLOB no longer rendered
@@ -1910,6 +2143,17 @@ function renderWhales() {
   }).join('');
 }
 
+// Refresh topbar win rate + alpha count from whale data
+(function(){
+  const valid = WHALES.filter(w => w.win_rate && w.win_rate !== 50);
+  const wr = valid.length ? valid.reduce((a,w)=>a+w.win_rate,0)/valid.length : null;
+  const el = document.getElementById('wr-top');
+  if (el && el.textContent === '—' && wr) el.textContent = wr.toFixed(1)+'%';
+  const al = document.getElementById('alpha-top');
+  if (al && (al.textContent === '—' || al.textContent === '0'))
+    al.textContent = WHALES.filter(w=>(w.whale_score||0)>70).length || '—';
+})();
+
 // ═══ RENDER: ALERTS ═════════════════════════════════════════════
 function addAlert(title, desc, time, color, url) {
   alertCount++;
@@ -2011,9 +2255,9 @@ function drawPriceChart() {
 
   priceChartData.forEach((c,i)=>{
   const bull = c.close >= c.open;
-  const wickCol = bull ? '#19ff9c' : '#ff4d6d';
-  const fillCol = bull ? 'rgba(25,255,156,.28)' : 'rgba(255,77,109,.32)';
-  const borderCol = bull ? '#19ff9c' : '#ff4d6d';
+  const wickCol = bull ? 'rgba(26,255,122,.45)' : 'rgba(220,50,70,.45)';
+  const fillCol = bull ? 'rgba(26,255,122,.1)' : 'rgba(220,50,70,.12)';
+  const borderCol = bull ? 'rgba(26,255,122,.5)' : 'rgba(220,50,70,.5)';
 
   const x = pd + i * cw + cw / 2;
 
@@ -2040,10 +2284,10 @@ function drawPriceChart() {
 
   const last=priceChartData[priceChartData.length-1];
   const ly=gy(last.close);
-  ctx.setLineDash([2,3]); ctx.strokeStyle='rgba(180,140,0,.55)';
+  ctx.setLineDash([2,4]); ctx.strokeStyle='rgba(255,255,255,.08)';
   ctx.beginPath();ctx.moveTo(pd,ly);ctx.lineTo(W-pd,ly);ctx.stroke();ctx.setLineDash([]);
-  ctx.fillStyle='#8a6a00'; ctx.font='bold 7px JetBrains Mono'; ctx.textAlign='left';
-  ctx.fillText(last.close.toFixed(1)+'¢',W-pd-28,ly-2);
+  const ohlcEl=document.getElementById('ohlc-last');
+  if(ohlcEl) ohlcEl.textContent=last.close.toFixed(1)+'¢';
 }
 
 // ═══ EQUITY CHART ═══════════════════════════════════════════════
@@ -2122,30 +2366,13 @@ function updateTrialUI() {
 }
 
 function showPaywall() {
-  trialExpired=true; if(ws)ws.close();
-  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
-  set('pw-trades',TRADES.length);
-  set('pw-vol',fmt(STATS.total_volume_24h||0));
-  set('pw-whales',WHALES.length);
-  const pw=document.getElementById('paywall');
-  if(pw) pw.classList.add('show');
-  ['main'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.filter='blur(4px)';});
+  trialExpired = true;
+  if (ws) ws.close();
+  if (_licValid) return;
+  openAccessModal('license');
 }
-
-function selectPlan(p) {
-  selectedPlan=p;
-  document.getElementById('plan-m')?.classList.toggle('sel',p==='monthly');
-  document.getElementById('plan-y')?.classList.toggle('sel',p==='yearly');
-  const btn=document.getElementById('pw-btn');
-  if(btn) btn.textContent=p==='yearly'?'UNLOCK FULL ACCESS — $380/yr ▶':'UNLOCK FULL ACCESS — $35/mo ▶';
-}
-
-function checkout() {
-  // → Replace with Stripe Checkout URL:
-  // window.location.href = 'https://buy.stripe.com/YOUR_LINK_HERE';
-  alert(`→ Replace checkout() with your Stripe URL.\nPlan: ${selectedPlan==='yearly'?'$380/year':'$35/month'}`);
-}
-
+function selectPlan(p) { selectedPlan = p; }
+function checkout() { openAccessModal('buy'); }
 // ═══ EXECUTION LAYER ════════════════════════════════════════════
 function setQty(amt, el) {
   activeQty = amt;
@@ -2158,24 +2385,22 @@ function executeTrade(action) {
   if(!m) { alert('Select a market first'); return; }
   const url = m.url||`https://polymarket.com/event/${m.event_slug}`;
   const outcome = m.outcomes[0]?.name||'YES';
-  confirmRedirect(url, `${action} ${outcome} on ${m.short_name} for $${activeQty} on Polymarket?`);
+  confirmRedirect(url, `${action} ${outcome} on ${m.short_name} on Polymarket?`);
 }
 
 // ═══ MODAL ══════════════════════════════════════════════════════
 function confirmRedirect(url, msg='Opening Polymarket. Proceed?') {
+  if(!url||url==='#') return;
   const overlay=document.getElementById('modal-overlay');
   const btn=document.getElementById('modal-confirm');
   const msg2=document.getElementById('modal-msg');
   if(msg2) msg2.textContent=msg;
-  overlay?.classList.add('show');
+  if(overlay) overlay.style.display='flex';
   if(btn) btn.onclick=()=>{ window.open(url,'_blank'); closeModal(); };
 }
-function closeModal() { document.getElementById('modal-overlay')?.classList.remove('show'); }
-
-function handleMktLink(e) {
-  e.preventDefault();
-  const url = e.currentTarget.href||e.currentTarget.dataset.url;
-  if(url&&url!=='#') confirmRedirect(url);
+function closeModal() {
+  const o=document.getElementById('modal-overlay');
+  if(o) o.style.display='none';
 }
 
 // ═══ TICKER ═════════════════════════════════════════════════════
@@ -2308,8 +2533,9 @@ for(let i=0;i<30;i++){ equityVal+=((Math.random()-.47)*70); equityCurve.push({ts
 drawEquity(); updateEquityUI(); drawPriceChart();
 connect();
 
-// ═══ LICENSE SYSTEM ═══════════════════════════════════════════════════════════
+// ═══ LICENSE SYSTEM ══════════════════════════════════════════════════════════
 const _LK = 'wt_lic', _DK = 'wt_dev', _CK = 'wt_cache';
+let _licValid = false, _revalTimer = null;
 
 function _devId() {
   let d = localStorage.getItem(_DK);
@@ -2317,99 +2543,176 @@ function _devId() {
   return d;
 }
 
-async function _licValidate(key) {
-  const dev = _devId();
-  try {
-    const r = await fetch(`/validate?key=${encodeURIComponent(key)}&device=${encodeURIComponent(dev)}`);
-    const j = await r.json();
-    if (j.valid) {
-      localStorage.setItem(_LK, key);
-      localStorage.setItem(_CK, JSON.stringify({ ts: Date.now(), expires: j.expires, status: j.status }));
-    }
-    return j;
-  } catch(e) {
-    // Offline: check cache
-    const c = _licCacheValid();
-    if (c) return { valid: true, status: 'CACHED', expires: c.expires };
-    return { valid: false, status: 'OFFLINE', expires: '' };
-  }
-}
-
 function _licCacheValid() {
   try {
     const c = JSON.parse(localStorage.getItem(_CK) || '{}');
-    if (!c.ts) return null;
-    if (Date.now() - c.ts < 86400000) return c; // < 24h
-    return null;
+    if (!c.ts || Date.now() - c.ts >= 86400000) return null;
+    return c;
   } catch { return null; }
 }
 
-function _showLicModal() {
-  const el = document.getElementById('lic-modal');
-  if (el) el.style.display = 'flex';
-  // blur main UI
-  const m = document.getElementById('main');
-  if (m) m.style.filter = 'blur(5px)';
+async function _licValidate(key) {
+  const dev = _devId();
+  try {
+    const r = await fetch(`${API}/validate?key=${encodeURIComponent(key)}&device=${encodeURIComponent(dev)}`);
+    if (!r.ok) throw new Error('http');
+    const j = await r.json();
+    if (j.valid) {
+      localStorage.setItem(_LK, key);
+      localStorage.setItem(_CK, JSON.stringify({ ts: Date.now(), expires: j.expires, status: j.status, warning: j.warning }));
+    }
+    return j;
+  } catch {
+    const c = _licCacheValid();
+    if (c) return { valid: true, status: 'CACHED', expires: c.expires, warning: c.warning || '' };
+    return { valid: false, status: 'OFFLINE', expires: '', warning: '' };
+  }
 }
 
-function _hideLicModal() {
-  const el = document.getElementById('lic-modal');
-  if (el) el.style.display = 'none';
+function _applyLicState(valid, warning) {
+  _licValid = valid;
   const m = document.getElementById('main');
-  if (m) m.style.filter = '';
+  if (valid) {
+    m?.classList.remove('blurred');
+    if (warning === 'multiple_devices') document.getElementById('am-warn-banner')?.classList.add('show');
+  } else {
+    m?.classList.add('blurred');
+  }
 }
 
 async function _licActivate() {
   const input = document.getElementById('lic-input');
   const status = document.getElementById('lic-status');
   const key = (input?.value || '').trim().toUpperCase();
-  if (!key) { if(status) { status.textContent = '⚠ Enter a license key'; status.style.color = '#ffb800'; } return; }
+  if (!key) { if (status) { status.textContent = '⚠ Enter your license key'; status.style.color = '#ffb800'; } return; }
   if (status) { status.textContent = 'Validating…'; status.style.color = '#5e849e'; }
   const result = await _licValidate(key);
   if (result.valid) {
     if (status) { status.textContent = `✓ ${result.status} — expires ${result.expires || 'LIFETIME'}`; status.style.color = '#00ff88'; }
-    setTimeout(() => { _hideLicModal(); document.getElementById('paywall')?.classList.remove('show'); }, 900);
+    _applyLicState(true, result.warning);
+    setTimeout(() => closeAccessModal(), 900);
+    _startRevalidation();
   } else {
-    const msgs = { DEVICE_MISMATCH: '✗ Key bound to another device', EXPIRED: '✗ License expired', INVALID: '✗ Invalid key', OFFLINE: '⚠ Offline — try again shortly' };
+    const msgs = { TOO_MANY_DEVICES: '✗ Too many devices — contact support', EXPIRED: '✗ License expired', INACTIVE: '✗ Key inactive — contact support', INVALID: '✗ Invalid key', OFFLINE: '⚠ Offline — try again shortly' };
     if (status) { status.textContent = msgs[result.status] || '✗ Validation failed'; status.style.color = '#ff3355'; }
   }
 }
 
-// ─── Boot: check stored license before showing paywall ─────────────────────
+function _startRevalidation() {
+  if (_revalTimer) clearInterval(_revalTimer);
+  _revalTimer = setInterval(async () => {
+    const stored = localStorage.getItem(_LK);
+    if (!stored) return;
+    const r = await _licValidate(stored);
+    _applyLicState(r.valid, r.warning);
+    if (!r.valid && trialExpired) openAccessModal('license');
+  }, 7 * 60 * 1000);
+}
+
+function openAccessModal(tab) {
+  document.getElementById('access-modal')?.classList.add('show');
+  switchAmTab(tab || 'license');
+  const closeBtn = document.getElementById('am-close-btn');
+  if (closeBtn) closeBtn.style.display = (trialExpired && !_licValid) ? 'none' : '';
+  if (tab === 'buy') _loadPaymentInfo();
+}
+
+function closeAccessModal() {
+  if (trialExpired && !_licValid) return;
+  document.getElementById('access-modal')?.classList.remove('show');
+}
+
+function switchAmTab(tab) {
+  ['license','buy'].forEach(t => {
+    document.getElementById('am-tab-'+t)?.classList.toggle('active', t===tab);
+    document.getElementById('am-pane-'+t)?.classList.toggle('active', t===tab);
+  });
+  if (tab === 'buy') _loadPaymentInfo();
+}
+
+let _payInfoLoaded = false;
+async function _loadPaymentInfo() {
+  if (_payInfoLoaded) return;
+  try {
+    const j = await (await fetch(`${API}/api/payment-info`)).json();
+    _payInfoLoaded = true;
+    const addrList = document.getElementById('am-addr-list');
+    if (addrList && j.networks) {
+      addrList.innerHTML = j.networks.map(n => `
+        <div class="am-addr-box">
+          <div style="flex:1;min-width:0"><div class="am-network">${n.name}</div><div class="am-addr">${n.address}</div></div>
+          <button class="am-copy" onclick="_copyAddr('${n.address}',this)">COPY</button>
+        </div>`).join('');
+    }
+    function _submitPayment() {
+  const txHash   = (document.getElementById('am-txhash')?.value||'').trim();
+  const telegram = (document.getElementById('am-telegram')?.value||'').trim();
+  if (!txHash)   { alert('Please enter your TX hash.'); return; }
+  if (!telegram) { alert('Please enter your Telegram username.'); return; }
+  navigator.clipboard.writeText(`WHALE.TERMINAL ACCESS\nPlan: ${_amPlan}\nTX: ${txHash}\nTelegram: ${telegram}`).catch(()=>{});
+  const btn = document.getElementById('am-pay-submit');
+  if (btn) { btn.textContent='✓ SUBMITTED — await your key on Telegram'; btn.style.color='#00ff88'; btn.disabled=true; }
+  const note = document.getElementById('am-tg-note');
+  if (note) note.innerHTML='<strong style="color:var(--cyan)">Details copied to clipboard.</strong> Also send to our Telegram. Key arrives within 24h.';
+}
+  } catch {
+    const el = document.getElementById('am-addr-list');
+    if (el) el.innerHTML = '<div style="color:#ff3355;font-size:8px;padding:8px">Failed to load — refresh and try again.</div>';
+  }
+}
+
+function _copyAddr(addr, btn) {
+  navigator.clipboard.writeText(addr).then(() => {
+    if (btn) { btn.textContent = 'COPIED ✓'; btn.classList.add('copied'); setTimeout(() => { btn.textContent='COPY'; btn.classList.remove('copied'); }, 2000); }
+  }).catch(() => {
+    const ta = Object.assign(document.createElement('textarea'),{value:addr,style:'position:fixed;opacity:0'});
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    if (btn) { btn.textContent='COPIED ✓'; btn.classList.add('copied'); setTimeout(()=>{btn.textContent='COPY';btn.classList.remove('copied');},2000); }
+  });
+}
+
+let _amPlan = 'yearly';
+function selectAmPlan(p) {
+  _amPlan = p;
+  ['monthly','yearly'].forEach(x => {
+    const el = document.getElementById('am-plan-'+x);
+    if (!el) return;
+    el.style.borderColor = x===p ? 'var(--cyan)' : 'var(--b1)';
+    el.style.background  = x===p ? 'rgba(0,212,255,.05)' : 'none';
+  });
+}
+
+function _submitPayment() {
+  const txHash   = (document.getElementById('am-txhash')?.value||'').trim();
+  const telegram = (document.getElementById('am-telegram')?.value||'').trim();
+  if (!txHash)   { alert('Please enter your TX hash.'); return; }
+  if (!telegram) { alert('Please enter your Telegram username.'); return; }
+  navigator.clipboard.writeText(`WHALE.TERMINAL ACCESS\nPlan: ${_amPlan}\nTX: ${txHash}\nTelegram: ${telegram}`).catch(()=>{});
+  const btn = document.getElementById('am-pay-submit');
+  if (btn) { btn.textContent='✓ SUBMITTED — await your key on Telegram'; btn.style.color='#00ff88'; btn.disabled=true; }
+  const note = document.getElementById('am-tg-note');
+  if (note) note.innerHTML='<strong style="color:var(--cyan)">Details copied to clipboard.</strong> Also send to our Telegram. Key arrives within 24h.';
+}
+
+// ─── Boot ─────────────────────────────────────────────────────────────────────
 (async function _licBoot() {
   const stored = localStorage.getItem(_LK);
-  // Fast path: cached validation still fresh
-  if (stored && _licCacheValid()) { console.log('%c✓ License cached','color:#00FF88'); return; }
-  // Try network validation if key stored
+  if (stored && _licCacheValid()) {
+    const c = _licCacheValid();
+    _applyLicState(true, c?.warning || '');
+    _startRevalidation();
+    console.log('%c✓ License cached','color:#00FF88');
+    return;
+  }
   if (stored) {
     const r = await _licValidate(stored);
-    if (r.valid) { console.log('%c✓ License valid','color:#00FF88'); return; }
+    if (r.valid) { _applyLicState(true, r.warning); _startRevalidation(); console.log('%c✓ License valid','color:#00FF88'); return; }
   }
-  // Will be called by showPaywall() after trial ends — nothing to do now
+  console.log('%c○ No license — trial active','color:#ffb800');
 })();
 
-// Patch showPaywall to show license modal instead of blurring everything
-const _origShowPaywall = showPaywall;
-showPaywall = function() {
-  // Set paywall stats
-  const set = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
-  set('pw-trades', TRADES.length);
-  set('pw-vol', fmt(STATS.total_volume_24h||0));
-  set('pw-whales', WHALES.length);
-  trialExpired = true;
-  if (ws) ws.close();
-  if (_licCacheValid()) { console.log('License valid, suppressing paywall'); return; }
-  // Populate stats
-  const _s = id => { const e = document.getElementById(id); return e; };
-  const _fmt = v => !v||isNaN(v)?'$0':v>=1e6?'$'+(v/1e6).toFixed(1)+'M':v>=1000?'$'+(v/1000).toFixed(1)+'K':'$'+Math.round(v);
-  if(_s('lm-signals')) _s('lm-signals').textContent = EDGE_SIGNALS.length;
-  if(_s('lm-vol'))     _s('lm-vol').textContent     = _fmt(STATS.total_volume_24h||0);
-  if(_s('lm-whales'))  _s('lm-whales').textContent  = WHALES.filter(w=>w.total_volume>=5000).length;
-  if(_s('lm-trades'))  _s('lm-trades').textContent  = TRADES.length;
-  if(_s('lm-biggest')) _s('lm-biggest').textContent = _fmt(STATS.biggest_trade||0);
-  if(_s('lm-mkts'))    _s('lm-mkts').textContent    = MARKETS.length;
-  _showLicModal();
-};
+document.getElementById('lic-input')?.addEventListener('keydown', e => { if (e.key==='Enter') _licActivate(); });
+document.addEventListener('keydown', e => { if (e.key==='Escape') closeAccessModal(); });
 // ═══ EDGE FEED MODAL ════════════════════════════════════════════
 let _emFilter = 'ALL';
 function filterEdgeModal(f) {
@@ -2527,13 +2830,665 @@ function renderEdgeModal() {
   }).join('');
 }
 
+function openHow() {
+  document.getElementById('how-modal').style.display = 'flex';
+  renderHowContent();
+}
+function closeHow() {
+  document.getElementById('how-modal').style.display = 'none';
+}
+function renderHowContent() {
+  const body = document.getElementById('how-body');
+  if (!body || body.dataset.loaded) return;
+  body.dataset.loaded = '1';
+
+  // SVG mini-illustrations inline
+  const SVG = {
+    edge: `<svg viewBox="0 0 120 60" xmlns="http://www.w3.org/2000/svg" style="width:120px;height:60px;display:block">
+      <rect width="120" height="60" fill="#020c14"/>
+      <polyline points="0,45 20,40 40,35 60,20 80,15 100,8 120,5" fill="none" stroke="#00FF88" stroke-width="1.5" opacity=".8"/>
+      <circle cx="100" cy="8" r="4" fill="#00FF88" opacity=".9"/>
+      <line x1="60" y1="0" x2="60" y2="60" stroke="rgba(0,212,255,.2)" stroke-dasharray="3,3" stroke-width="1"/>
+      <text x="62" y="14" fill="#00d4ff" font-size="6" font-family="monospace">BREAK</text>
+      <circle cx="60" cy="20" r="3" fill="#FFB800"/>
+    </svg>`,
+
+    velocity: `<svg viewBox="0 0 120 60" xmlns="http://www.w3.org/2000/svg" style="width:120px;height:60px;display:block">
+      <rect width="120" height="60" fill="#020c14"/>
+      ${[8,18,28,38,48,60,80,100,110].map((x,i)=>{const h=i<6?8+i*3:8+i*6+10;return `<rect x="${x}" y="${60-h}" width="7" height="${h}" fill="${i>=6?'rgba(0,255,136,.85)':'rgba(0,212,255,.35)'}"/>`}).join('')}
+      <text x="60" y="14" fill="#00FF88" font-size="7" font-family="monospace" text-anchor="middle">4× SURGE</text>
+      <line x1="55" y1="0" x2="55" y2="60" stroke="rgba(255,184,0,.5)" stroke-dasharray="2,2" stroke-width="1"/>
+    </svg>`,
+
+    whale: `<svg viewBox="0 0 120 60" xmlns="http://www.w3.org/2000/svg" style="width:120px;height:60px;display:block">
+      <rect width="120" height="60" fill="#020c14"/>
+      <circle cx="30" cy="30" r="8" fill="rgba(0,255,136,.2)" stroke="#00FF88" stroke-width="1.2"/>
+      <circle cx="60" cy="25" r="14" fill="rgba(0,255,136,.25)" stroke="#00FF88" stroke-width="1.5"/>
+      <circle cx="95" cy="32" r="6" fill="rgba(255,51,85,.2)" stroke="#FF3355" stroke-width="1"/>
+      <text x="60" y="29" fill="#fff" font-size="9" font-family="monospace" text-anchor="middle">🐋</text>
+      <text x="30" y="34" fill="#00FF88" font-size="5" font-family="monospace" text-anchor="middle">$42K</text>
+      <text x="95" y="36" fill="#FF3355" font-size="5" font-family="monospace" text-anchor="middle">$8K</text>
+    </svg>`,
+
+    pressure: `<svg viewBox="0 0 120 60" xmlns="http://www.w3.org/2000/svg" style="width:120px;height:60px;display:block">
+      <rect width="120" height="60" fill="#020c14"/>
+      <rect x="10" y="20" width="60" height="10" fill="rgba(0,255,136,.4)" rx="2"/>
+      <rect x="70" y="20" width="40" height="10" fill="rgba(255,51,85,.35)" rx="2"/>
+      <text x="40" y="28" fill="#00FF88" font-size="7" font-family="monospace" text-anchor="middle">YES 60%</text>
+      <text x="90" y="28" fill="#FF3355" font-size="7" font-family="monospace" text-anchor="middle">NO 40%</text>
+      <line x1="60" y1="0" x2="60" y2="60" stroke="rgba(255,184,0,.6)" stroke-width="1.5"/>
+      <text x="60" y="50" fill="#FFB800" font-size="6" font-family="monospace" text-anchor="middle">⚠ IMBALANCE</text>
+    </svg>`,
+
+    map: `<svg viewBox="0 0 120 60" xmlns="http://www.w3.org/2000/svg" style="width:120px;height:60px;display:block">
+      <rect width="120" height="60" fill="#000"/>
+      <polyline points="0,40 20,38 40,30 60,32 80,20 100,18 120,10" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="1"/>
+      ${[[15,36,6,'00FF88'],[35,28,10,'00FF88'],[60,30,8,'FF3355'],[80,18,12,'00FF88'],[100,16,5,'FF3355']].map(([x,y,r,c])=>`
+        <circle cx="${x}" cy="${y-r*0.6}" r="${r}" fill="rgba(0,255,136,.2)" stroke="#${c}" stroke-width="1" opacity=".85"/>
+        <circle cx="${x}" cy="${y+r*0.6}" r="${r*0.6}" fill="rgba(255,51,85,.15)" stroke="#FF3355" stroke-width=".8" opacity=".6"/>
+      `).join('')}
+    </svg>`,
+
+    heatmap: `<svg viewBox="0 0 120 60" xmlns="http://www.w3.org/2000/svg" style="width:120px;height:60px;display:block">
+      <rect width="120" height="60" fill="#020c14"/>
+      ${[[0,'rgba(0,255,136,.55)'],[30,'rgba(255,184,0,.5)'],[60,'rgba(255,51,85,.5)'],[90,'rgba(0,212,255,.45)']].map(([x,c])=>`
+        <rect x="${x+2}" y="8" width="26" height="22" fill="${c}" rx="2"/>
+        <rect x="${x+2}" y="32" width="26" height="22" fill="${c}" rx="2" opacity=".6"/>
+      `).join('')}
+      <text x="60" y="58" fill="rgba(94,132,158,.7)" font-size="5" font-family="monospace" text-anchor="middle">MARKET HEAT</text>
+    </svg>`,
+
+    howto: `<svg viewBox="0 0 120 60" xmlns="http://www.w3.org/2000/svg" style="width:120px;height:60px;display:block">
+      <rect width="120" height="60" fill="#020c14"/>
+      ${[1,2,3,4,5].map((n,i)=>`
+        <circle cx="16" cy="${8+i*11}" r="5" fill="rgba(0,212,255,.15)" stroke="#00d4ff" stroke-width="1"/>
+        <text x="16" y="${11+i*11}" fill="#00d4ff" font-size="6" font-family="monospace" text-anchor="middle">${n}</text>
+        <rect x="28" y="${5+i*11}" width="${55+Math.random()*20|0}" height="6" fill="rgba(0,212,255,.12)" rx="1"/>
+      `).join('')}
+    </svg>`
+  };
+
+  const sections = [
+    {
+      tag:'OVERVIEW', tagColor:'#00d4ff', tagBorder:'rgba(0,212,255,.35)',
+      icon:'🔥', title:'What This Terminal Does',
+      svg: SVG.edge,
+      body:'Detects high-probability moves on Polymarket using real-time whale activity, volume acceleration, and crowd positioning. Every signal has a measured edge — no noise, no guessing. Signals are scored live and ranked by confidence.',
+      stats:[{l:'Avg Hit Rate',v:'66%',c:'#00FF88'},{l:'Signal Types',v:'10',c:'#00d4ff'},{l:'Data Lag',v:'<2s',c:'#FFB800'}]
+    },
+    {
+      tag:'SIGNAL', tagColor:'#FFB800', tagBorder:'rgba(255,184,0,.35)',
+      icon:'⚡', title:'Velocity Surge',
+      svg: SVG.velocity,
+      body:'1-min order-flow spikes 4× above the 60-min baseline. Breakout imminent. Act within <strong style="color:#fff">3–8 min</strong>. High false-positive rate on low-volume markets — filter by $1K+.',
+      stats:[{l:'Hit Rate',v:'61%',c:'#FFB800'},{l:'Window',v:'3–8m',c:'#00d4ff'},{l:'Avg Move',v:'+9%',c:'#00FF88'}]
+    },
+    {
+      tag:'SIGNAL', tagColor:'#FFB800', tagBorder:'rgba(255,184,0,.35)',
+      icon:'📉', title:'Momentum Break',
+      body:'Probability crosses a structural key level with volume confirmation — not random noise. Indicates continuation or reversal. Window: <strong style="color:#fff">5–12 min</strong>.',
+      svg: SVG.edge,
+      stats:[{l:'Hit Rate',v:'69%',c:'#00FF88'},{l:'Window',v:'5–12m',c:'#00d4ff'},{l:'Avg Move',v:'+15%',c:'#00FF88'}]
+    },
+    {
+      tag:'SIGNAL', tagColor:'#9B5DE5', tagBorder:'rgba(155,93,229,.35)',
+      icon:'🐋', title:'Whale Flow & Prints',
+      svg: SVG.whale,
+      body:'Tracks $5K+ trades from wallets with verified edge — scored by win rate, ROI, consistency, and volume. Whale Print = single oversized block. Smart Cluster = 3+ alpha wallets same outcome in 15 min.',
+      stats:[{l:'Whale Print HR',v:'65%',c:'#FFB800'},{l:'Cluster HR',v:'72%',c:'#00FF88'},{l:'Min Trade',v:'$5K',c:'#00d4ff'}]
+    },
+    {
+      tag:'PANEL', tagColor:'#00E5CC', tagBorder:'rgba(0,229,204,.35)',
+      icon:'🧠', title:'Position Pressure',
+      svg: SVG.pressure,
+      body:'YES/NO crowd split combined with smart money bias. When crowd is 70%+ one side and whales are opposite — highest-conviction fade setup. Green = buy pressure, Red = sell pressure, bar width = imbalance magnitude.',
+      stats:[{l:'Panel',v:'CENTER',c:'#00d4ff'},{l:'Update',v:'Live',c:'#00FF88'},{l:'Best Use',v:'Fade',c:'#FF3355'}]
+    },
+    {
+      tag:'PANEL', tagColor:'#00FF88', tagBorder:'rgba(0,255,136,.35)',
+      icon:'📊', title:'Market Pressure Map',
+      svg: SVG.map,
+      body:'Canvas chart showing buy/sell bubble clusters over time. Bubble size = trade volume. Green = buy-side pressure, Red = sell-side. Price line shows live movement. <strong style="color:#fff">Drag to pan</strong> left/right through history.',
+      stats:[{l:'Background',v:'Pure Black',c:'#fff'},{l:'Draggable',v:'Yes',c:'#00FF88'},{l:'Max Points',v:'80',c:'#00d4ff'}]
+    },
+    {
+      tag:'PANEL', tagColor:'#00d4ff', tagBorder:'rgba(0,212,255,.35)',
+      icon:'▦', title:'Market Heatmap',
+      svg: SVG.heatmap,
+      body:'All active Polymarket markets color-coded by recent price move. Green = rising probability, Red = falling. Cell size = relative volume. Click any tile to jump to that market and load live order book + whale data.',
+      stats:[{l:'Markets',v:'Live',c:'#00d4ff'},{l:'Sort By',v:'Vol/Move',c:'#FFB800'},{l:'Click',v:'→ Market',c:'#00FF88'}]
+    },
+    {
+      tag:'GUIDE', tagColor:'#FF6B35', tagBorder:'rgba(255,107,53,.35)',
+      icon:'🎯', title:'How To Use — 5 Steps',
+      svg: SVG.howto,
+      steps:[
+        '<strong style="color:#fff">Filter signals</strong> — Set SIZE to $1K+, focus on <span style="color:#ff3355">CRITICAL</span> or <span style="color:#FFB800">HIGH</span> priority only',
+        '<strong style="color:#fff">Confirm with Whale Flow</strong> — are big wallets aligned with the signal direction?',
+        '<strong style="color:#fff">Check Position Pressure</strong> — is there crowd imbalance to fade or follow?',
+        '<strong style="color:#fff">Act fast</strong> — each card shows its valid window (e.g. 5–12 min). Edge decays fast.',
+        '<strong style="color:#fff">Use the OHLC chart</strong> — time entry around current price level on the center panel'
+      ]
+    }
+  ];
+
+  body.innerHTML = sections.map(s => `
+    <div class="how-section" style="display:grid;grid-template-columns:1fr 130px;gap:16px;align-items:start">
+      <div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <div class="how-tag" style="color:${s.tagColor};border-color:${s.tagBorder};margin-bottom:0">${s.tag}</div>
+          <div class="how-title" style="margin-bottom:0">${s.icon} ${s.title}</div>
+        </div>
+        ${s.steps
+          ? `<div class="how-steps">${s.steps.map((st,i)=>`<div class="how-step"><span class="how-step-num">${i+1}.</span><span>${st}</span></div>`).join('')}</div>`
+          : `<div class="how-body">${s.body}</div>`
+        }
+        ${s.stats ? `<div style="display:flex;gap:10px;margin-top:10px">${s.stats.map(st=>`
+          <div style="background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.07);padding:5px 10px;border-radius:2px">
+            <div style="font-size:6px;color:var(--t3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:2px">${st.l}</div>
+            <div style="font-family:'Orbitron';font-size:11px;font-weight:700;color:${st.c}">${st.v}</div>
+          </div>`).join('')}</div>` : ''}
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.5);border:1px solid rgba(0,212,255,.1);border-radius:3px;padding:6px;margin-top:4px">
+        ${s.svg}
+      </div>
+    </div>`).join('');
+}
+
+// ═══ WHALE BATTLEFIELD ══════════════════════════════════════════
+(function(){
+  let _wbZones = [];
+
+  function drawWhaleBattlefield() {
+    const canvas = document.getElementById('whale-battle-canvas');
+    if (!canvas) return;
+    const dpr = window.devicePixelRatio || 1;
+    const W = canvas.offsetWidth, H = canvas.offsetHeight;
+    if (!W || !H) return;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+    _wbZones = [];
+
+    const whales = [...WHALES].sort((a,b)=>(b.total_volume||0)-(a.total_volume||0)).slice(0,12);
+    if (!whales.length) {
+      ctx.fillStyle='rgba(94,132,158,.25)'; ctx.font='8px JetBrains Mono'; ctx.textAlign='center';
+      ctx.fillText('AWAITING WHALE ACTIVITY…', W/2, H/2); return;
+    }
+
+    // BG grid
+    ctx.fillStyle='#020c14'; ctx.fillRect(0,0,W,H);
+    for(let x=0;x<W;x+=40){ctx.strokeStyle='rgba(0,212,255,.04)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+    for(let y=0;y<H;y+=30){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+    const maxVol = Math.max(...whales.map(w=>w.total_volume||0), 1);
+    const maxScore = Math.max(...whales.map(w=>w.whale_score||0), 1);
+
+    // Deterministic positions from wallet hash
+    function hashPos(str, seed) {
+      let h = seed; for(const c of str||'x') h=(h*31+c.charCodeAt(0))>>>0;
+      return h;
+    }
+
+    const PAD=28;
+    whales.forEach((w,i) => {
+      const vol   = w.total_volume||1;
+      const score = w.whale_score||50;
+      const isBuy = (w.dominant_action||'BUYER')==='BUYER';
+      const name  = (w.pseudonym||w.wallet_short||'???').toUpperCase().slice(0,10);
+      const wallet= w.wallet||'';
+
+      // position — spread them across canvas
+      const hx = hashPos(wallet, 7);
+      const hy = hashPos(wallet, 13);
+      const x  = PAD + ((hx % 1000)/1000) * (W - PAD*2);
+      const y  = PAD + ((hy % 1000)/1000) * (H - PAD*2);
+
+      // radius scaled by volume
+      const r = 6 + (vol/maxVol) * Math.min(W,H) * 0.12;
+
+      // color: buyer=green, seller=red, score drives intensity
+      const alpha = 0.25 + (score/maxScore)*0.5;
+      const baseColor = isBuy ? `rgba(0,255,136,${alpha})` : `rgba(255,51,85,${alpha})`;
+      const glowColor = isBuy ? '#00FF88' : '#FF3355';
+      const borderColor= isBuy ? `rgba(0,255,136,${0.5+score/maxScore*0.5})` : `rgba(255,51,85,${0.5+score/maxScore*0.5})`;
+
+      // outer glow ring
+      ctx.shadowColor=glowColor; ctx.shadowBlur=r*0.8;
+      ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
+      ctx.fillStyle=baseColor; ctx.fill();
+      ctx.strokeStyle=borderColor; ctx.lineWidth=1.5; ctx.stroke();
+      ctx.shadowBlur=0;
+
+      // inner bright core
+      const coreR = r*0.3;
+      ctx.beginPath(); ctx.arc(x,y,coreR,0,Math.PI*2);
+      ctx.fillStyle=isBuy?'rgba(0,255,136,.9)':'rgba(255,51,85,.9)';
+      ctx.shadowColor=glowColor; ctx.shadowBlur=coreR*2;
+      ctx.fill(); ctx.shadowBlur=0;
+
+      // rank badge for top 3
+      if(i<3){
+        ctx.font=`700 ${7+i===0?2:0}px JetBrains Mono`;
+        ctx.fillStyle='rgba(255,184,0,.9)';
+        ctx.textAlign='center';
+        ctx.shadowColor='#FFB800'; ctx.shadowBlur=6;
+        ctx.fillText(['👑','②','③'][i], x, y-r-4);
+        ctx.shadowBlur=0;
+      }
+
+      // name label
+      ctx.font='700 7px JetBrains Mono';
+      ctx.textAlign='center';
+      ctx.fillStyle=isBuy?'rgba(0,255,136,.9)':'rgba(255,51,85,.9)';
+      ctx.shadowColor=glowColor; ctx.shadowBlur=4;
+      ctx.fillText(name, x, y+r+10);
+      ctx.shadowBlur=0;
+
+      // vol label
+      const volStr='$'+(vol>=1000?(vol/1000).toFixed(1)+'K':vol.toFixed(0));
+      ctx.font='6px JetBrains Mono';
+      ctx.fillStyle='rgba(94,132,158,.7)';
+      ctx.fillText(volStr, x, y+r+18);
+
+      // score ring arc
+      ctx.beginPath();
+      ctx.arc(x,y,r+3, -Math.PI/2, -Math.PI/2+(score/100)*Math.PI*2);
+      ctx.strokeStyle=score>80?'rgba(255,184,0,.7)':score>60?'rgba(0,212,255,.7)':'rgba(155,93,229,.5)';
+      ctx.lineWidth=1.5; ctx.stroke();
+
+      _wbZones.push({x,y,r:r+4,wallet});
+    });
+
+    // draw connection lines between top 5 (alliance map)
+    const top5 = whales.slice(0,5);
+    for(let i=0;i<top5.length-1;i++){
+      const wa=top5[i], wb=top5[i+1];
+      const hxa=hashPos(wa.wallet||'',7),hya=hashPos(wa.wallet||'',13);
+      const hxb=hashPos(wb.wallet||'',7),hyb=hashPos(wb.wallet||'',13);
+      const ax=PAD+((hxa%1000)/1000)*(W-PAD*2), ay=PAD+((hya%1000)/1000)*(H-PAD*2);
+      const bx=PAD+((hxb%1000)/1000)*(W-PAD*2), by=PAD+((hyb%1000)/1000)*(H-PAD*2);
+      ctx.beginPath(); ctx.moveTo(ax,ay); ctx.lineTo(bx,by);
+      ctx.strokeStyle='rgba(0,212,255,.08)'; ctx.lineWidth=1;
+      ctx.setLineDash([3,5]); ctx.stroke(); ctx.setLineDash([]);
+    }
+  }
+  // ═══ WHALE ALERT SYSTEM ══════════════════════════════════════════
+let _waTmr = null, _waStart = 0, _waRaf = null;
+let _soundMuted = false;
+function toggleSound(btn) {
+  _soundMuted = !_soundMuted;
+  btn.textContent = _soundMuted ? '🔇 SOUND' : '🔊 SOUND';
+  btn.style.borderColor = _soundMuted ? 'rgba(255,51,85,.3)' : 'rgba(0,255,136,.3)';
+  btn.style.background  = _soundMuted ? 'rgba(255,51,85,.06)' : 'rgba(0,255,136,.06)';
+  btn.style.color       = _soundMuted ? '#ff3355' : '#00ff88';
+}
+function playWhaleSound(tier) {
+  if (_soundMuted) return;
+  try {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    const ac = new AC();
+    const play = (freq, type, start, dur, gain=0.3) => {
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.connect(g); g.connect(ac.destination);
+      o.type = type; o.frequency.setValueAtTime(freq, ac.currentTime + start);
+      g.gain.setValueAtTime(0, ac.currentTime + start);
+      g.gain.linearRampToValueAtTime(gain, ac.currentTime + start + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + start + dur);
+      o.start(ac.currentTime + start); o.stop(ac.currentTime + start + dur);
+    };
+    if (tier === 'CRITICAL') {
+      // deep boom + rising arpeggio
+      play(60,  'sine',    0,    0.4, 0.5);
+      play(120, 'sine',    0,    0.35, 0.3);
+      play(440, 'square',  0.05, 0.12, 0.15);
+      play(554, 'square',  0.18, 0.12, 0.15);
+      play(659, 'square',  0.31, 0.18, 0.18);
+      play(880, 'sawtooth',0.44, 0.22, 0.12);
+    } else {
+      // clean 3-tone chime
+      play(440, 'sine', 0,    0.25, 0.25);
+      play(554, 'sine', 0.15, 0.25, 0.25);
+      play(659, 'sine', 0.3,  0.3,  0.25);
+    }
+  } catch(e) {}
+}
+
+function showWhaleAlert(t) {
+  const isBuy  = String(t.action||'').toUpperCase().includes('BUY');
+  const isSell = String(t.action||'').toUpperCase().includes('SELL');
+  const size   = t.size_usd || 0;
+  const tier   = size >= 50000 ? 'CRITICAL' : size >= 20000 ? 'HIGH' : 'WHALE';
+  const dc     = isBuy ? '#00ff88' : isSell ? '#ff3355' : '#00d4ff';
+  const db     = isBuy ? 'rgba(0,255,136,.12)' : isSell ? 'rgba(255,51,85,.12)' : 'rgba(0,212,255,.1)';
+  const dbo    = isBuy ? 'rgba(0,255,136,.5)' : isSell ? 'rgba(255,51,85,.5)' : 'rgba(0,212,255,.45)';
+  const dl     = isBuy ? '▲ BUY YES' : isSell ? '▼ BUY NO' : '◆ WATCH';
+  const tierColor = {CRITICAL:'#ff3355', HIGH:'#ffb800', WHALE:'#00d4ff'}[tier];
+  const wallet = t.wallet ? t.wallet.slice(0,6)+'…'+t.wallet.slice(-4) : '0xAnon';
+  const score  = t.whale_score ? t.whale_score.toFixed(0) : '—';
+  const sizeStr = size >= 1000 ? '$'+(size/1000).toFixed(1)+'K' : '$'+size.toFixed(0);
+
+  const badge = document.getElementById('wa-badge');
+  badge.textContent = tier;
+  badge.style.color = tierColor;
+  badge.style.border = `1px solid ${tierColor}`;
+  badge.style.background = tierColor.replace(')', ',.12)').replace('rgb','rgba');
+
+  document.getElementById('wa-market').textContent  = t.market || t.market_slug || 'Polymarket Market';
+  document.getElementById('wa-size').textContent    = sizeStr;
+  document.getElementById('wa-size').style.color    = tierColor;
+  document.getElementById('wa-price').textContent   = (t.price_cents||0).toFixed(1)+'¢';
+  document.getElementById('wa-price').style.color   = '#dff0f8';
+  document.getElementById('wa-action').textContent  = t.action || '—';
+  document.getElementById('wa-action').style.color  = dc;
+  document.getElementById('wa-score').textContent   = score;
+  document.getElementById('wa-score').style.color   = '#9b5de5';
+  document.getElementById('wa-pill').textContent    = dl;
+  document.getElementById('wa-pill').style.color    = dc;
+  document.getElementById('wa-pill').style.border   = `1px solid ${dbo}`;
+  document.getElementById('wa-pill').style.background = db;
+  document.getElementById('wa-outcome').textContent = t.outcome ? `→ ${t.outcome}` : '';
+  document.getElementById('wa-wallet').textContent  = `🐋 ${wallet}`;
+  document.getElementById('wa-ago').textContent     = 'just now';
+
+  const el = document.getElementById('whale-alert');
+  el.classList.remove('dismissing');
+  el.style.display = 'block';
+
+  // border accent by tier
+  el.style.borderColor = tierColor.replace(')', ',.5)').replace('#','rgba(').replace(/([0-9a-f]{2})/gi, (m,h)=>parseInt(h,16)+',').slice(0,-1);
+  el.style.borderColor = dbo; // simpler
+
+  // timer bar (8s auto-dismiss)
+  const DURATION = 8000;
+  _waStart = performance.now();
+  if (_waRaf) cancelAnimationFrame(_waRaf);
+  const bar = document.getElementById('wa-timer-bar');
+  const tick = now => {
+    const pct = Math.max(0, 1 - (now - _waStart) / DURATION);
+    bar.style.width = (pct * 100) + '%';
+    if (pct > 0) _waRaf = requestAnimationFrame(tick);
+  };
+  _waRaf = requestAnimationFrame(tick);
+  if (_waTmr) clearTimeout(_waTmr);
+  _waTmr = setTimeout(dismissWhaleAlert, DURATION);
+
+  playWhaleSound(tier);
+}
+
+function dismissWhaleAlert() {
+  const el = document.getElementById('whale-alert');
+  if (_waTmr) clearTimeout(_waTmr);
+  if (_waRaf) cancelAnimationFrame(_waRaf);
+  el.classList.add('dismissing');
+  setTimeout(() => { el.style.display='none'; el.classList.remove('dismissing'); }, 260);
+}
+  // click → profile
+  function onWBClick(e){
+    const c=document.getElementById('whale-battle-canvas'); if(!c) return;
+    const rect=c.getBoundingClientRect();
+    const mx=e.clientX-rect.left, my=e.clientY-rect.top;
+    for(const z of _wbZones){
+      const dx=mx-z.x,dy=my-z.y;
+      if(dx*dx+dy*dy<=z.r*z.r&&z.wallet){confirmRedirect('https://polymarket.com/profile/'+z.wallet);return;}
+    }
+  }
+  function onWBMove(e){
+    const c=document.getElementById('whale-battle-canvas'); if(!c) return;
+    const rect=c.getBoundingClientRect();
+    const mx=e.clientX-rect.left, my=e.clientY-rect.top;
+    c.style.cursor=_wbZones.some(z=>{const dx=mx-z.x,dy=my-z.y;return dx*dx+dy*dy<=z.r*z.r;})?'pointer':'crosshair';
+  }
+
+  window.drawWhaleBattlefield=drawWhaleBattlefield;
+
+  document.addEventListener('DOMContentLoaded',()=>{
+    const c=document.getElementById('whale-battle-canvas');
+    if(c){c.addEventListener('click',onWBClick);c.addEventListener('mousemove',onWBMove);}
+    setTimeout(drawWhaleBattlefield,700);
+  });
+
+  const _origRW=window.renderWhales;
+  if(_origRW) window.renderWhales=function(){_origRW();setTimeout(drawWhaleBattlefield,50);};
+  window.addEventListener('resize',drawWhaleBattlefield);
+})();
+
+// REMOVED: whale pnl chart block below (replaced by battlefield above)
+(function(){
+  let _whaleHitZones = [];
+
+  function renderWhaleChart() {
+    const canvas = document.getElementById('whale-chart-canvas');
+    const panel  = document.getElementById('whale-chart-panel');
+    if (!canvas || !panel) return;
+    const W = panel.clientWidth;
+    const H = panel.clientHeight - 28;
+    if (W < 10 || H < 10) return;
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width  = W * dpr;
+    canvas.height = H * dpr;
+    canvas.style.width  = W + 'px';
+    canvas.style.height = H + 'px';
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+    _whaleHitZones = [];
+
+    const whales = [...WHALES].filter(w=>(w.pnl_proxy||0)>0).sort((a,b)=>(b.pnl_proxy||0)-(a.pnl_proxy||0)).slice(0,8);
+  if (!whales.length) {
+    ctx.fillStyle = 'rgba(94,132,158,.3)';
+    ctx.font = '9px JetBrains Mono';
+    ctx.textAlign = 'center';
+    ctx.fillText('AWAITING WHALE DATA…', W/2, H/2);
+    return;
+  }
+
+    const PAD = {l:10, r:10, t:22, b:30};
+    const cW = W - PAD.l - PAD.r;
+    const cH = H - PAD.t - PAD.b;
+    const n   = whales.length;
+    const barW = Math.max(8, Math.floor((cW / n) * 0.62));
+    const slotW = cW / n;
+    const maxPnl = Math.max(...whales.map(w=>Math.abs(w.pnl_proxy||0)), 1);
+    const zeroY  = PAD.t + cH * 0.5;
+
+    for (let y = PAD.t; y < H - PAD.b; y += 4) {
+      ctx.fillStyle = 'rgba(0,212,255,.012)';
+      ctx.fillRect(PAD.l, y, cW, 1);
+    }
+
+    [0.25, 0.5, 0.75, 1].forEach(f => {
+      const y = PAD.t + cH * f;
+      ctx.strokeStyle = 'rgba(0,212,255,.06)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([2,4]);
+      ctx.beginPath(); ctx.moveTo(PAD.l, y); ctx.lineTo(W-PAD.r, y); ctx.stroke();
+      ctx.setLineDash([]);
+    });
+
+    ctx.strokeStyle = 'rgba(0,212,255,.2)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(PAD.l, zeroY); ctx.lineTo(W-PAD.r, zeroY); ctx.stroke();
+
+    const dotPoints = [];
+
+    whales.forEach((w, i) => {
+      const pnl    = w.pnl_proxy || 0;
+      const score  = w.whale_score || 0;
+      const name   = (w.pseudonym || w.wallet_short || '???').toUpperCase().slice(0,11);
+      const wallet = w.wallet || '';
+      const isPos  = pnl >= 0;
+      const ratio  = pnl / maxPnl;
+      const barH   = Math.abs(ratio) * (cH * 0.44);
+      const xC     = PAD.l + slotW * i + slotW / 2;
+      const xL     = xC - barW / 2;
+      const barTop = isPos ? zeroY - barH : zeroY;
+
+      _whaleHitZones.push({ x:xL, y:barTop, w:barW, h:Math.max(barH,4), wallet });
+
+      ctx.shadowColor = isPos ? '#00FF88' : '#FF3355';
+      ctx.shadowBlur  = 18;
+
+      const grd = ctx.createLinearGradient(0, barTop, 0, barTop + barH);
+      if (isPos) {
+        grd.addColorStop(0, 'rgba(0,255,136,1)');
+        grd.addColorStop(0.5,'rgba(0,220,110,.7)');
+        grd.addColorStop(1, 'rgba(0,100,60,.2)');
+      } else {
+        grd.addColorStop(0, 'rgba(255,51,85,.2)');
+        grd.addColorStop(0.5,'rgba(255,51,85,.7)');
+        grd.addColorStop(1, 'rgba(255,51,85,1)');
+      }
+      ctx.fillStyle = grd;
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(xL, barTop, barW, Math.max(barH, 2), [3,3,1,1]);
+      else ctx.rect(xL, barTop, barW, Math.max(barH,2));
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      ctx.strokeStyle = isPos ? 'rgba(0,255,136,.8)' : 'rgba(255,51,85,.8)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(xL, barTop); ctx.lineTo(xL+barW, barTop);
+      ctx.stroke();
+
+      const chipY = isPos ? barTop - 8 : barTop + barH + 8;
+      const chipColor = score > 80 ? '#FFB800' : score > 60 ? '#00D4FF' : '#9B5DE5';
+      ctx.shadowColor = chipColor; ctx.shadowBlur = 8;
+      ctx.fillStyle = chipColor;
+      ctx.beginPath(); ctx.arc(xC, chipY, 3.5, 0, Math.PI*2); ctx.fill();
+      ctx.shadowBlur = 0;
+      dotPoints.push({x:xC, y:chipY});
+
+      const pnlStr = (isPos?'+':'') + (Math.abs(pnl)>=1000 ? '$'+(pnl/1000).toFixed(1)+'K' : '$'+pnl.toFixed(0));
+      ctx.font = '700 9px JetBrains Mono';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = isPos ? '#00FF88' : '#FF3355';
+      ctx.shadowColor = ctx.fillStyle; ctx.shadowBlur = 8;
+      ctx.fillText(pnlStr, xC, isPos ? barTop - 16 : barTop + barH + 20);
+      ctx.shadowBlur = 0;
+
+      if (i === 0) {
+        ctx.font = '13px serif';
+        ctx.fillText('🐋', xC, isPos ? barTop - 28 : barTop + barH + 34);
+      }
+
+      ctx.font = '700 8px JetBrains Mono';
+      ctx.fillStyle = 'rgba(0,212,255,.9)';
+      ctx.shadowColor = 'rgba(0,212,255,.5)'; ctx.shadowBlur = 4;
+      ctx.fillText(name, xC, H - 11);
+      ctx.shadowBlur = 0;
+
+      ctx.font = '700 7px JetBrains Mono';
+      ctx.fillStyle = 'rgba(94,132,158,.8)';
+      ctx.fillText('#'+(i+1), xC, H - 2);
+    });
+
+    if (dotPoints.length > 1) {
+      ctx.beginPath();
+      ctx.strokeStyle = 'rgba(0,212,255,.35)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([3,4]);
+      dotPoints.forEach((p,i)=> i===0 ? ctx.moveTo(p.x,p.y) : ctx.lineTo(p.x,p.y));
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+  }
+
+  function onWhaleCanvasClick(e) {
+    const canvas = document.getElementById('whale-chart-canvas');
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    for (const z of _whaleHitZones) {
+      if (mx >= z.x && mx <= z.x+z.w && my >= z.y && my <= z.y+z.h && z.wallet) {
+        confirmRedirect('https://polymarket.com/profile/'+z.wallet);
+        return;
+      }
+    }
+  }
+
+  function onWhaleCanvasMove(e) {
+    const canvas = document.getElementById('whale-chart-canvas');
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    const hit = _whaleHitZones.some(z => mx>=z.x && mx<=z.x+z.w && my>=z.y && my<=z.y+z.h);
+    canvas.style.cursor = hit ? 'pointer' : 'default';
+  }
+
+  window.renderWhaleChart = renderWhaleChart;
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const c = document.getElementById('whale-chart-canvas');
+    if (c) {
+      c.addEventListener('click', onWhaleCanvasClick);
+      c.addEventListener('mousemove', onWhaleCanvasMove);
+    }
+    setTimeout(renderWhaleChart, 600);
+  });
+
+  const _orig = window.renderWhales;
+  if (_orig) window.renderWhales = function(){ _orig(); setTimeout(renderWhaleChart,50); };
+
+  window.addEventListener('resize', renderWhaleChart);
+})();
+
 // Close on Escape (extend existing listener)
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { closeEdgeFeedModal(); closeHeatmapModal(); }
+  if (e.key === 'Escape') { closeEdgeFeedModal(); closeHeatmapModal(); closeHow(); }
 });
 
 // Allow pressing Enter in license input
 document.getElementById('lic-input')?.addEventListener('keydown', e => { if (e.key === 'Enter') _licActivate(); });
 </script>
+<div id="modal-overlay" style="display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)">
+  <div style="background:linear-gradient(135deg,#060d14,#0a1828);border:1px solid rgba(0,212,255,.25);box-shadow:0 0 40px rgba(0,212,255,.12),0 0 80px rgba(0,0,0,.8);padding:32px 36px;min-width:360px;max-width:440px;font-family:'JetBrains Mono',monospace;text-align:center;position:relative">
+    <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#00D4FF,transparent)"></div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:6px">
+      <span style="font-size:18px">🐋</span>
+      <div style="font-family:'Orbitron';font-size:10px;font-weight:900;color:#00D4FF;letter-spacing:3px">POLYMARKET REDIRECT</div>
+    </div>
+    <div style="width:40px;height:1px;background:rgba(0,212,255,.3);margin:12px auto"></div>
+    <div id="modal-msg" style="font-size:11px;color:#dff0f8;line-height:1.6;margin-bottom:24px;padding:0 8px"></div>
+    <div style="display:flex;gap:10px;justify-content:center">
+      <button id="modal-confirm" style="background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.5);color:#00FF88;font-family:'JetBrains Mono';font-size:9px;font-weight:700;letter-spacing:1.5px;padding:9px 24px;cursor:pointer;transition:all .15s;text-transform:uppercase" onmouseover="this.style.background='rgba(0,255,136,.18)'" onmouseout="this.style.background='rgba(0,255,136,.08)'">OPEN ON POLYMARKET ↗</button>
+      <button onclick="closeModal()" style="background:rgba(255,51,85,.06);border:1px solid rgba(255,51,85,.4);color:#FF3355;font-family:'JetBrains Mono';font-size:9px;font-weight:700;letter-spacing:1.5px;padding:9px 20px;cursor:pointer;transition:all .15s;text-transform:uppercase" onmouseover="this.style.background='rgba(255,51,85,.15)'" onmouseout="this.style.background='rgba(255,51,85,.06)'">CANCEL</button>
+    </div>
+    <div style="margin-top:16px;font-size:7px;color:#243544;letter-spacing:1px">YOU WILL BE REDIRECTED TO AN EXTERNAL SITE</div>
+  </div>
+</div>
+<!-- WHALE ALERT POPUP -->
+<div id="whale-alert-overlay">
+  <div id="whale-alert">
+    <div class="wa-corner tl"></div><div class="wa-corner tr"></div>
+    <div class="wa-corner bl"></div><div class="wa-corner br"></div>
+    <div class="wa-header">
+      <div class="wa-title-row">
+        <span class="wa-icon">🐋</span>
+        <span class="wa-label">WHALE DETECTED</span>
+        <span class="wa-badge" id="wa-badge">HIGH</span>
+      </div>
+      <button class="wa-close" onclick="dismissWhaleAlert()">✕</button>
+    </div>
+    <div class="wa-body">
+      <div class="wa-market" id="wa-market">—</div>
+      <div class="wa-stats">
+        <div class="wa-stat"><div class="wa-stat-l">SIZE</div><div class="wa-stat-v" id="wa-size">—</div></div>
+        <div class="wa-stat"><div class="wa-stat-l">PRICE</div><div class="wa-stat-v" id="wa-price">—</div></div>
+        <div class="wa-stat"><div class="wa-stat-l">ACTION</div><div class="wa-stat-v" id="wa-action">—</div></div>
+        <div class="wa-stat"><div class="wa-stat-l">SCORE</div><div class="wa-stat-v" id="wa-score">—</div></div>
+      </div>
+      <div class="wa-action-row">
+        <div class="wa-action-pill" id="wa-pill">—</div>
+        <div class="wa-outcome" id="wa-outcome">—</div>
+      </div>
+    </div>
+    <div class="wa-footer">
+      <span class="wa-wallet" id="wa-wallet">—</span>
+      <span style="font-size:6.5px;color:var(--t3)" id="wa-ago">—</span>
+    </div>
+    <div class="wa-timer-bar" id="wa-timer-bar"></div>
+  </div>
+</div>
 </body>
 </html>
