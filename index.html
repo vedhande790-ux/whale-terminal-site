@@ -957,6 +957,9 @@ const API = (() => {
 let TRADES=[], MARKETS=[], WHALES=[], SIGNALS={}, STATS={}, ORDER_BOOKS={}, EDGE_SIGNALS=[];
 let feedPaused=false, whaleOnly=false, alertCount=0;
 let trialRemaining=300, trialTotal=300, trialExpired=false;
+// ── Single source of truth ──
+let appMode = 'trial'; // 'trial' | 'locked' | 'premium'
+let _trialTimer = null;
 let equityCurve=[], equityVal=10000, athVal=10000;
 let buyVol=0, sellVol=0;
 let priceChartData=[], candleDuration=60000;
@@ -1028,7 +1031,8 @@ function initHeatmapBaseline(m) {
 
 // ═══ SNAPSHOT ════════════════════════════════════════════════════
 function onSnapshot(d) {
-  if (!_licValid) {
+  // trial time now driven by localStorage wt_trial_start — ignore server value for premium
+  if (appMode !== 'premium' && d.trial_remaining_secs !== undefined) {
     trialRemaining = d.trial_remaining_secs;
     trialTotal     = d.trial_total_secs || 300;
   }
@@ -1308,7 +1312,7 @@ function onLeaderboard(data) {
 
 // ═══ HEARTBEAT ══════════════════════════════════════════════════
 function onHeartbeat(d) {
-  if (!_licValid) trialRemaining = d.trial_remaining_secs;
+  if (appMode !== 'premium' && d.trial_remaining_secs !== undefined) trialRemaining = d.trial_remaining_secs;
   updateTrialUI();
 }
 function openEdgeSignal(sig) {
@@ -2365,22 +2369,71 @@ function updateBSR() {
 }
 
 // ═══ TRIAL UI ═══════════════════════════════════════════════════
+function _applyAppMode(mode) {
+  appMode = mode;
+  const main       = document.getElementById('main');
+  const trialWrap  = document.getElementById('trial-wrap');
+  const unlockBtn  = document.getElementById('unlock-btn');
+
+  if (mode === 'premium') {
+    // full access — nuke every trial artifact
+    _licValid = true;
+    trialExpired = false;
+    trialRemaining = 999999;
+    if (_trialTimer) { clearInterval(_trialTimer); _trialTimer = null; }
+    main?.classList.remove('blurred');
+    document.getElementById('access-modal')?.classList.remove('show');
+    document.getElementById('paywall')?.classList.remove('show');
+    if (trialWrap)  trialWrap.style.display  = 'none';
+    if (unlockBtn)  unlockBtn.style.display  = 'none';
+    if (!ws || ws.readyState === WebSocket.CLOSED || ws.readyState === WebSocket.CLOSING) connect();
+
+  } else if (mode === 'trial') {
+    _licValid = false;
+    trialExpired = false;
+    main?.classList.remove('blurred');
+    document.getElementById('access-modal')?.classList.remove('show');
+    if (trialWrap)  trialWrap.style.display  = '';
+    if (unlockBtn)  unlockBtn.style.display  = '';
+    _startTrialTimer();
+
+  } else { // locked
+    _licValid = false;
+    trialExpired = true;
+    if (_trialTimer) { clearInterval(_trialTimer); _trialTimer = null; }
+    if (trialWrap)  trialWrap.style.display  = 'none';
+    if (unlockBtn)  unlockBtn.style.display  = '';
+    main?.classList.add('blurred');
+    if (ws) ws.close();
+    openAccessModal('license');
+  }
+}
+
+function _startTrialTimer() {
+  if (_trialTimer) return; // already running — no duplicates
+  _trialTimer = setInterval(() => {
+    if (appMode !== 'trial') { clearInterval(_trialTimer); _trialTimer = null; return; }
+    const start = parseInt(localStorage.getItem('wt_trial_start') || '0');
+    const elapsed = start ? Math.floor((Date.now() - start) / 1000) : 0;
+    trialRemaining = Math.max(0, 300 - elapsed);
+    trialTotal = 300;
+    const fill = document.getElementById('trial-fill');
+    if (fill) fill.style.width = (trialRemaining / 300 * 100) + '%';
+    const el = document.getElementById('trial-time');
+    const m = Math.floor(trialRemaining / 60), s = trialRemaining % 60;
+    if (el) { el.textContent = `${m}:${s.toString().padStart(2,'0')}`; el.style.color = trialRemaining < 60 ? 'var(--red)' : trialRemaining < 120 ? 'var(--yellow)' : 'var(--green)'; }
+    if (trialRemaining <= 0) _applyAppMode('locked');
+  }, 1000);
+}
+
 function updateTrialUI() {
-  if (_licValid) return; // paid user — ignore trial entirely
-  const rem=Math.max(0,trialRemaining);
-  const fill=document.getElementById('trial-fill');
-  if(fill) fill.style.width=(rem/trialTotal*100)+'%';
-  const m=Math.floor(rem/60), s=rem%60;
-  const el=document.getElementById('trial-time');
-  if(el){el.textContent=`${m}:${s.toString().padStart(2,'0')}`;el.style.color=rem<60?'var(--red)':rem<120?'var(--yellow)':'var(--green)';}
-  if(rem<=0) showPaywall();
+  if (appMode === 'premium') return;
+  // driven by _startTrialTimer now — no-op here to avoid breaking callers
 }
 
 function showPaywall() {
-  if (_licValid) return; // paid user — never show paywall
-  trialExpired = true;
-  if (ws) ws.close();
-  openAccessModal('license');
+  if (appMode === 'premium') return;
+  _applyAppMode('locked');
 }
 function selectPlan(p) { selectedPlan = p; }
 function checkout() { openAccessModal('buy'); }
@@ -2588,36 +2641,14 @@ async function _licValidate(key) {
 }
 
 function _applyLicState(valid, warning) {
-  _licValid = valid;
-  const m = document.getElementById('main');
   if (valid) {
-    m?.classList.remove('blurred');
-    document.getElementById('access-modal')?.classList.remove('show');
-    document.getElementById('paywall')?.classList.remove('show');
-
-    // hide trial bar + unlock button — user is paid, not on trial
-    const trialWrap = document.getElementById('trial-wrap');
-    if (trialWrap) trialWrap.style.display = 'none';
-    const unlockBtn = document.getElementById('unlock-btn');
-    if (unlockBtn) unlockBtn.style.display = 'none';
-
-    // stop trial countdown from doing anything
-    trialExpired = false;
-    trialRemaining = 999999;
-
+    localStorage.setItem('wt_trial_start', '0'); // clear trial
+    _applyAppMode('premium');
     if (warning === 'multiple_devices') document.getElementById('am-warn-banner')?.classList.add('show');
-    if (!ws || ws.readyState === WebSocket.CLOSED || ws.readyState === WebSocket.CLOSING) {
-      connect();
-    }
   } else {
-    m?.classList.add('blurred');
-    const trialWrap = document.getElementById('trial-wrap');
-    if (trialWrap) trialWrap.style.display = '';
-    const unlockBtn = document.getElementById('unlock-btn');
-    if (unlockBtn) unlockBtn.style.display = '';
+    if (appMode !== 'premium') _applyAppMode('locked');
   }
 }
-
 async function _licActivate() {
   const inputs = document.querySelectorAll('#lic-input');
   const input = [...inputs].find(el => el.value.trim()) || inputs[inputs.length - 1];
@@ -2758,9 +2789,11 @@ function _submitPayment() {
 
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 (async function _licBoot() {
-  const msg  = document.getElementById('boot-msg');
-  const sub  = document.getElementById('boot-sub');
-  const bar  = document.getElementById('boot-bar');
+  await new Promise(r => { if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', r); else r(); });
+
+  const msg = document.getElementById('boot-msg');
+  const sub = document.getElementById('boot-sub');
+  const bar = document.getElementById('boot-bar');
 
   const steps = [
     [0,   'FETCHING SIGNALS...',        'CALIBRATING MODELS...'],
@@ -2769,43 +2802,51 @@ function _submitPayment() {
     [3200,'🚀 ALMOST READY...',         'FIRST LOAD MAY TAKE ~30s'],
   ];
   let pct = 0;
-  steps.forEach(([delay, m, s]) => {
-    setTimeout(() => {
-      if (msg) msg.textContent = m;
-      if (sub) sub.textContent = s;
-      pct = Math.min(pct + 25, 90);
-      if (bar) bar.style.width = pct + '%';
-    }, delay);
-  });
+  steps.forEach(([delay, m, s]) => { setTimeout(() => { if(msg) msg.textContent=m; if(sub) sub.textContent=s; pct=Math.min(pct+25,90); if(bar) bar.style.width=pct+'%'; }, delay); });
 
   function hideOverlay() {
     if (bar) bar.style.width = '100%';
-    setTimeout(() => {
-      const ov = document.getElementById('boot-overlay');
-      if (ov) { ov.style.transition = 'opacity .5s'; ov.style.opacity = '0'; setTimeout(() => ov.remove(), 500); }
-    }, 300);
+    setTimeout(() => { const ov = document.getElementById('boot-overlay'); if(ov){ov.style.transition='opacity .5s';ov.style.opacity='0';setTimeout(()=>ov.remove(),500);} }, 300);
   }
 
+  // ── Step 1: check stored license ──
   const stored = localStorage.getItem(_LK);
-  try {
-    if (stored && _licCacheValid()) {
-      const c = _licCacheValid();
-      _applyLicState(true, c?.warning || '');
-      _startRevalidation();
-      console.log('%c✓ License cached','color:#00FF88');
-      hideOverlay(); return;
-    }
-    if (stored) {
-      const r = await _licValidate(stored);
-      if (r.valid) { _applyLicState(true, r.warning); _startRevalidation(); console.log('%c✓ License valid','color:#00FF88'); hideOverlay(); return; }
-    }
-    console.log('%c○ No license — trial active','color:#ffb800');
-  } catch(err) {
-    if (msg) { msg.textContent = '⚠️ CONNECTION ISSUE. RETRYING...'; msg.style.color = '#ffb800'; }
-    await new Promise(r => setTimeout(r, 3000));
+  if (stored) {
     try {
-      if (stored) { const r = await _licValidate(stored); if (r.valid) { _applyLicState(true, r.warning); } }
-    } catch {}
+      let r = _licCacheValid();
+      if (!r) r = await _licValidate(stored);
+      if (r && r.valid) {
+        _applyAppMode('premium');
+        _startRevalidation();
+        console.log('%c✓ PREMIUM','color:#00FF88');
+        hideOverlay(); return;
+      }
+    } catch(err) {
+      if (msg) { msg.textContent = '⚠️ CONNECTION ISSUE. RETRYING...'; msg.style.color = '#ffb800'; }
+      await new Promise(r => setTimeout(r, 4000));
+      try {
+        const r2 = await _licValidate(stored);
+        if (r2.valid) { _applyAppMode('premium'); _startRevalidation(); hideOverlay(); return; }
+      } catch {}
+    }
+  }
+
+  // ── Step 2: trial or locked ──
+  const start = parseInt(localStorage.getItem('wt_trial_start') || '0');
+  const now = Date.now();
+  if (!start) {
+    localStorage.setItem('wt_trial_start', String(now));
+    _applyAppMode('trial');
+    console.log('%c○ TRIAL started','color:#ffb800');
+  } else {
+    const elapsed = Math.floor((now - start) / 1000);
+    if (elapsed < 300) {
+      _applyAppMode('trial');
+      console.log('%c○ TRIAL resuming','color:#ffb800');
+    } else {
+      _applyAppMode('locked');
+      console.log('%c✗ LOCKED','color:#ff3355');
+    }
   }
   hideOverlay();
 })();
