@@ -975,7 +975,7 @@ function connect() {
     console.log('%c🐋 Connected','color:#00FF88;font-weight:bold');
   };
   ws.onmessage = e => { try { dispatch(JSON.parse(e.data)); } catch(err){ console.error(err); } };
-  ws.onclose   = () => { if(!trialExpired) setTimeout(connect,3000); };
+  ws.onclose   = () => { if(_licValid || !trialExpired) setTimeout(connect,3000); };
   ws.onerror   = () => ws.close();
 }
 
@@ -1028,8 +1028,10 @@ function initHeatmapBaseline(m) {
 
 // ═══ SNAPSHOT ════════════════════════════════════════════════════
 function onSnapshot(d) {
-  trialRemaining = d.trial_remaining_secs;
-  trialTotal     = d.trial_total_secs || 300;
+  if (!_licValid) {
+    trialRemaining = d.trial_remaining_secs;
+    trialTotal     = d.trial_total_secs || 300;
+  }
 
   if(d.order_books) d.order_books.forEach(b => ORDER_BOOKS[b.condition_id] = b);
   if(d.trades)   { TRADES = d.trades; renderTrades(); }
@@ -1306,7 +1308,7 @@ function onLeaderboard(data) {
 
 // ═══ HEARTBEAT ══════════════════════════════════════════════════
 function onHeartbeat(d) {
-  trialRemaining = d.trial_remaining_secs;
+  if (!_licValid) trialRemaining = d.trial_remaining_secs;
   updateTrialUI();
 }
 function openEdgeSignal(sig) {
@@ -2364,6 +2366,7 @@ function updateBSR() {
 
 // ═══ TRIAL UI ═══════════════════════════════════════════════════
 function updateTrialUI() {
+  if (_licValid) return; // paid user — ignore trial entirely
   const rem=Math.max(0,trialRemaining);
   const fill=document.getElementById('trial-fill');
   if(fill) fill.style.width=(rem/trialTotal*100)+'%';
@@ -2374,9 +2377,9 @@ function updateTrialUI() {
 }
 
 function showPaywall() {
+  if (_licValid) return; // paid user — never show paywall
   trialExpired = true;
   if (ws) ws.close();
-  if (_licValid) return;
   openAccessModal('license');
 }
 function selectPlan(p) { selectedPlan = p; }
@@ -2591,35 +2594,68 @@ function _applyLicState(valid, warning) {
     m?.classList.remove('blurred');
     document.getElementById('access-modal')?.classList.remove('show');
     document.getElementById('paywall')?.classList.remove('show');
+
+    // hide trial bar + unlock button — user is paid, not on trial
+    const trialWrap = document.getElementById('trial-wrap');
+    if (trialWrap) trialWrap.style.display = 'none';
+    const unlockBtn = document.getElementById('unlock-btn');
+    if (unlockBtn) unlockBtn.style.display = 'none';
+
+    // stop trial countdown from doing anything
+    trialExpired = false;
+    trialRemaining = 999999;
+
     if (warning === 'multiple_devices') document.getElementById('am-warn-banner')?.classList.add('show');
-    // reconnect ws if it was closed by trial expiry
     if (!ws || ws.readyState === WebSocket.CLOSED || ws.readyState === WebSocket.CLOSING) {
       connect();
     }
   } else {
     m?.classList.add('blurred');
+    const trialWrap = document.getElementById('trial-wrap');
+    if (trialWrap) trialWrap.style.display = '';
+    const unlockBtn = document.getElementById('unlock-btn');
+    if (unlockBtn) unlockBtn.style.display = '';
   }
 }
 
 async function _licActivate() {
-  // Two #lic-input elements exist — grab all and use the one with a value
   const inputs = document.querySelectorAll('#lic-input');
   const input = [...inputs].find(el => el.value.trim()) || inputs[inputs.length - 1];
   const status = document.getElementById('lic-status');
   const key = (input?.value || '').trim();
-  console.log('[whale] activate clicked, key:', key, 'API:', API);
   if (!key) { if (status) { status.textContent = '⚠ Enter your license key'; status.style.color = '#ffb800'; } return; }
-  if (status) { status.textContent = '⏳ Validating… (may take 30s if server is waking)'; status.style.color = '#5e849e'; }
-  const result = await _licValidate(key);
-  console.log('[whale] validate result:', result);
+
+  // disable button while validating
+  const btn = document.querySelector('.am-lic-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '...'; }
+  if (status) { status.textContent = '⏳ Contacting server…'; status.style.color = '#5e849e'; }
+
+  let result = await _licValidate(key);
+
+  // if OFFLINE — auto retry once after 4s (Render cold start)
+  if (result.status === 'OFFLINE') {
+    if (status) { status.textContent = '🚀 Server waking up, retrying in 4s…'; status.style.color = '#ffb800'; }
+    await new Promise(r => setTimeout(r, 4000));
+    result = await _licValidate(key);
+  }
+
+  if (btn) { btn.disabled = false; btn.textContent = 'ACTIVATE'; }
+
   if (result.valid) {
-    if (status) { status.textContent = `✓ ${result.status} — expires ${result.expires || 'LIFETIME'}`; status.style.color = '#00ff88'; }
-    _licValid = true;                          // set BEFORE closeAccessModal guard checks it
-    _applyLicState(true, result.warning);      // removes blur, hides modal, reconnects ws
+    if (status) { status.textContent = `✓ License active — expires ${result.expires || 'LIFETIME'}`; status.style.color = '#00ff88'; }
+    _licValid = true;
+    _applyLicState(true, result.warning);
     _startRevalidation();
   } else {
-    const msgs = { TOO_MANY_DEVICES: '✗ Too many devices — contact support', EXPIRED: '✗ License expired', INACTIVE: '✗ Key inactive — contact support', INVALID: '✗ Invalid key', OFFLINE: '⚠ Offline — try again shortly' };
-    if (status) { status.textContent = msgs[result.status] || '✗ Validation failed'; status.style.color = '#ff3355'; }
+    const msgs = {
+      INVALID:         '✗ Invalid key — check and try again',
+      EXPIRED:         '✗ License expired — buy a new one below',
+      INACTIVE:        '✗ Key inactive — contact support on Telegram',
+      TOO_MANY_DEVICES:'✗ Too many devices — contact support on Telegram',
+      ERROR:           '✗ Server error — try again in 1 min',
+      OFFLINE:         '✗ Server unreachable — check internet or try again',
+    };
+    if (status) { status.textContent = msgs[result.status] || `✗ Validation failed (${result.status})`; status.style.color = '#ff3355'; }
   }
 }
 
@@ -2630,7 +2666,7 @@ function _startRevalidation() {
     if (!stored) return;
     const r = await _licValidate(stored);
     _applyLicState(r.valid, r.warning);
-    if (!r.valid && trialExpired) openAccessModal('license');
+    if (!r.valid && trialExpired && !_licValid) openAccessModal('license');
   }, 7 * 60 * 1000);
 }
 
