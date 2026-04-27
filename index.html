@@ -2553,16 +2553,23 @@ function _licCacheValid() {
 
 async function _licValidate(key) {
   const dev = _devId();
+  const url = `${API}/validate?key=${encodeURIComponent(key)}&device=${encodeURIComponent(dev)}`;
+  console.log('[whale] _licValidate URL:', url);
   try {
-    const r = await fetch(`${API}/validate?key=${encodeURIComponent(key)}&device=${encodeURIComponent(dev)}`);
-    if (!r.ok) throw new Error('http');
-    const j = await r.json();
+    const r = await fetch(url);
+    console.log('[whale] validate HTTP status:', r.status);
+    const text = await r.text();
+    console.log('[whale] validate response body:', text);
+    let j;
+    try { j = JSON.parse(text); } catch { throw new Error('bad json: ' + text); }
+    if (!r.ok) throw new Error('http ' + r.status);
     if (j.valid) {
       localStorage.setItem(_LK, key);
       localStorage.setItem(_CK, JSON.stringify({ ts: Date.now(), expires: j.expires, status: j.status, warning: j.warning }));
     }
     return j;
-  } catch {
+  } catch(err) {
+    console.error('[whale] validate error:', err);
     const c = _licCacheValid();
     if (c) return { valid: true, status: 'CACHED', expires: c.expires, warning: c.warning || '' };
     return { valid: false, status: 'OFFLINE', expires: '', warning: '' };
@@ -2581,9 +2588,12 @@ function _applyLicState(valid, warning) {
 }
 
 async function _licActivate() {
-  const input = document.getElementById('lic-input');
+  // Two #lic-input elements exist — grab all and use the one with a value
+  const inputs = document.querySelectorAll('#lic-input');
+  const input = [...inputs].find(el => el.value.trim()) || inputs[inputs.length - 1];
   const status = document.getElementById('lic-status');
   const key = (input?.value || '').trim().toUpperCase();
+  console.log('[whale] activate clicked, key:', key, 'API:', API);
   if (!key) { if (status) { status.textContent = '⚠ Enter your license key'; status.style.color = '#ffb800'; } return; }
   if (status) { status.textContent = 'Validating…'; status.style.color = '#5e849e'; }
   const result = await _licValidate(key);
