@@ -492,7 +492,15 @@ canvas{display:block;width:100%;height:100%}
 </style>
 </head>
 <body>
-
+<!-- BOOT OVERLAY -->
+<div id="boot-overlay" style="position:fixed;inset:0;z-index:99999;background:#020509;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;font-family:'Orbitron',sans-serif">
+  <div style="font-size:18px;font-weight:900;letter-spacing:4px;color:#00d4ff;text-shadow:0 0 20px rgba(0,212,255,.6)">🐋 WHALE.TERMINAL</div>
+  <div id="boot-msg" style="font-size:9px;letter-spacing:2px;color:#5e849e;transition:color .3s">⏳ SYNCING MARKET INTELLIGENCE...</div>
+  <div id="boot-sub" style="font-size:8px;letter-spacing:1.5px;color:#2a4a5e">CONNECTING TO EXECUTION ENGINE...</div>
+  <div style="margin-top:12px;width:180px;height:2px;background:#0a1520;border-radius:2px;overflow:hidden">
+    <div id="boot-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#00d4ff,#00ff88);transition:width .4s ease;box-shadow:0 0 8px #00d4ff"></div>
+  </div>
+</div>
 <div id="ticker"><div class="t-scroll" id="t-inner"></div></div>
 
 <!-- TOPBAR -->
@@ -941,7 +949,7 @@ canvas{display:block;width:100%;height:100%}
 // API endpoint - works with file:// protocol, localhost server, or production
 const API = (() => {
   const host = window.location.hostname;
-  if (!host || host === '') return 'http://localhost:8080'; // file:// protocol
+  if (!host || host === '') return 'https://whale-terminal-backend.onrender.com';
   if (host === 'localhost' || host === '127.0.0.1') return 'http://localhost:8080';
   return window.BACKEND_URL || 'https://whale-terminal-backend.onrender.com';
 })();
@@ -2601,7 +2609,7 @@ async function _licActivate() {
   const key = (input?.value || '').trim().toUpperCase();
   console.log('[whale] activate clicked, key:', key, 'API:', API);
   if (!key) { if (status) { status.textContent = '⚠ Enter your license key'; status.style.color = '#ffb800'; } return; }
-  if (status) { status.textContent = 'Validating…'; status.style.color = '#5e849e'; }
+  if (status) { status.textContent = '⏳ Validating… (may take 30s if server is waking)'; status.style.color = '#5e849e'; }
   const result = await _licValidate(key);
   console.log('[whale] validate result:', result);
   if (result.valid) {
@@ -2714,19 +2722,56 @@ function _submitPayment() {
 
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 (async function _licBoot() {
+  const msg  = document.getElementById('boot-msg');
+  const sub  = document.getElementById('boot-sub');
+  const bar  = document.getElementById('boot-bar');
+
+  const steps = [
+    [0,   'FETCHING SIGNALS...',        'CALIBRATING MODELS...'],
+    [800, 'LOADING WHALE ACTIVITY...',  'SCANNING ORDER FLOW...'],
+    [1800,'MAPPING MARKET PRESSURE...', 'WARMING UP ENGINE...'],
+    [3200,'🚀 ALMOST READY...',         'FIRST LOAD MAY TAKE ~30s'],
+  ];
+  let pct = 0;
+  steps.forEach(([delay, m, s]) => {
+    setTimeout(() => {
+      if (msg) msg.textContent = m;
+      if (sub) sub.textContent = s;
+      pct = Math.min(pct + 25, 90);
+      if (bar) bar.style.width = pct + '%';
+    }, delay);
+  });
+
+  function hideOverlay() {
+    if (bar) bar.style.width = '100%';
+    setTimeout(() => {
+      const ov = document.getElementById('boot-overlay');
+      if (ov) { ov.style.transition = 'opacity .5s'; ov.style.opacity = '0'; setTimeout(() => ov.remove(), 500); }
+    }, 300);
+  }
+
   const stored = localStorage.getItem(_LK);
-  if (stored && _licCacheValid()) {
-    const c = _licCacheValid();
-    _applyLicState(true, c?.warning || '');
-    _startRevalidation();
-    console.log('%c✓ License cached','color:#00FF88');
-    return;
+  try {
+    if (stored && _licCacheValid()) {
+      const c = _licCacheValid();
+      _applyLicState(true, c?.warning || '');
+      _startRevalidation();
+      console.log('%c✓ License cached','color:#00FF88');
+      hideOverlay(); return;
+    }
+    if (stored) {
+      const r = await _licValidate(stored);
+      if (r.valid) { _applyLicState(true, r.warning); _startRevalidation(); console.log('%c✓ License valid','color:#00FF88'); hideOverlay(); return; }
+    }
+    console.log('%c○ No license — trial active','color:#ffb800');
+  } catch(err) {
+    if (msg) { msg.textContent = '⚠️ CONNECTION ISSUE. RETRYING...'; msg.style.color = '#ffb800'; }
+    await new Promise(r => setTimeout(r, 3000));
+    try {
+      if (stored) { const r = await _licValidate(stored); if (r.valid) { _applyLicState(true, r.warning); } }
+    } catch {}
   }
-  if (stored) {
-    const r = await _licValidate(stored);
-    if (r.valid) { _applyLicState(true, r.warning); _startRevalidation(); console.log('%c✓ License valid','color:#00FF88'); return; }
-  }
-  console.log('%c○ No license — trial active','color:#ffb800');
+  hideOverlay();
 })();
 
 document.getElementById('lic-input')?.addEventListener('keydown', e => { if (e.key==='Enter') _licActivate(); });
