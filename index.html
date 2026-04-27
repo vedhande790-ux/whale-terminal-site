@@ -2581,7 +2581,13 @@ function _applyLicState(valid, warning) {
   const m = document.getElementById('main');
   if (valid) {
     m?.classList.remove('blurred');
+    document.getElementById('access-modal')?.classList.remove('show');
+    document.getElementById('paywall')?.classList.remove('show');
     if (warning === 'multiple_devices') document.getElementById('am-warn-banner')?.classList.add('show');
+    // reconnect ws if it was closed by trial expiry
+    if (!ws || ws.readyState === WebSocket.CLOSED || ws.readyState === WebSocket.CLOSING) {
+      connect();
+    }
   } else {
     m?.classList.add('blurred');
   }
@@ -2597,10 +2603,11 @@ async function _licActivate() {
   if (!key) { if (status) { status.textContent = '⚠ Enter your license key'; status.style.color = '#ffb800'; } return; }
   if (status) { status.textContent = 'Validating…'; status.style.color = '#5e849e'; }
   const result = await _licValidate(key);
+  console.log('[whale] validate result:', result);
   if (result.valid) {
     if (status) { status.textContent = `✓ ${result.status} — expires ${result.expires || 'LIFETIME'}`; status.style.color = '#00ff88'; }
-    _applyLicState(true, result.warning);
-    setTimeout(() => closeAccessModal(), 900);
+    _licValid = true;                          // set BEFORE closeAccessModal guard checks it
+    _applyLicState(true, result.warning);      // removes blur, hides modal, reconnects ws
     _startRevalidation();
   } else {
     const msgs = { TOO_MANY_DEVICES: '✗ Too many devices — contact support', EXPIRED: '✗ License expired', INACTIVE: '✗ Key inactive — contact support', INVALID: '✗ Invalid key', OFFLINE: '⚠ Offline — try again shortly' };
@@ -2630,6 +2637,7 @@ function openAccessModal(tab) {
 function closeAccessModal() {
   if (trialExpired && !_licValid) return;
   document.getElementById('access-modal')?.classList.remove('show');
+  document.getElementById('paywall')?.classList.remove('show');
 }
 
 function switchAmTab(tab) {
