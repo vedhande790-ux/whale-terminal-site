@@ -2606,7 +2606,7 @@ async function _licActivate() {
   const inputs = document.querySelectorAll('#lic-input');
   const input = [...inputs].find(el => el.value.trim()) || inputs[inputs.length - 1];
   const status = document.getElementById('lic-status');
-  const key = (input?.value || '').trim().toUpperCase();
+  const key = (input?.value || '').trim();
   console.log('[whale] activate clicked, key:', key, 'API:', API);
   if (!key) { if (status) { status.textContent = '⚠ Enter your license key'; status.style.color = '#ffb800'; } return; }
   if (status) { status.textContent = '⏳ Validating… (may take 30s if server is waking)'; status.style.color = '#5e849e'; }
