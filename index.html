@@ -159,7 +159,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9998;
 .sig-card-body{padding:7px 10px;display:flex;flex-direction:column;gap:5px}
 .sig-card-footer{padding:5px 10px 7px;border-top:1px solid var(--b1);background:rgba(0,0,0,.2)}
 .sig-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
-.sig-kind{font-size:7px;font-weight:700;letter-spacing:2px;text-transform:uppercase}
+.sig-kind{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase}
 .sig-conf-wrap{display:flex;align-items:center;gap:5px}
 .sig-pri{font-size:7px;padding:2px 6px;font-weight:700;border:1px solid;letter-spacing:.8px;text-transform:uppercase}
 .pri-critical{color:#ff3355;border-color:rgba(255,51,85,.5);background:rgba(255,51,85,.15);text-shadow:0 0 8px rgba(255,51,85,.6)}
@@ -493,6 +493,44 @@ canvas{display:block;width:100%;height:100%}
 </head>
 <body>
 <!-- BOOT OVERLAY -->
+<!-- ONBOARDING MODAL -->
+<div id="onboard-modal" style="display:none;position:fixed;inset:0;z-index:99998;background:rgba(0,0,0,.85);align-items:center;justify-content:center">
+  <div style="background:#060f1a;border:1px solid rgba(0,212,255,.25);border-radius:6px;padding:32px 36px;max-width:460px;width:90%;font-family:'Orbitron',sans-serif;box-shadow:0 0 40px rgba(0,212,255,.1);position:relative">
+    <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#00D4FF,transparent);border-radius:6px 6px 0 0"></div>
+    <div style="font-size:14px;font-weight:900;letter-spacing:3px;color:#00d4ff;margin-bottom:4px">🐋 WHALE.TERMINAL</div>
+    <div style="font-size:8px;letter-spacing:2px;color:#5e849e;margin-bottom:20px">QUICK START GUIDE</div>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px">
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <span style="color:#00d4ff;font-size:11px;font-weight:900;min-width:20px">01</span>
+        <div><div style="font-size:9px;color:#e0e0e0;letter-spacing:1px;margin-bottom:2px">WATCH WHALE ENTRIES</div><div style="font-size:8px;color:#5e849e">Large positions ($5K+) signal smart money moves</div></div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <span style="color:#00ff88;font-size:11px;font-weight:900;min-width:20px">02</span>
+        <div><div style="font-size:9px;color:#e0e0e0;letter-spacing:1px;margin-bottom:2px">FOLLOW THE EDGE FEED</div><div style="font-size:8px;color:#5e849e">High-confidence signals with cause + confidence score</div></div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <span style="color:#ffb800;font-size:11px;font-weight:900;min-width:20px">03</span>
+        <div><div style="font-size:9px;color:#e0e0e0;letter-spacing:1px;margin-bottom:2px">SIZE + TIMING = EDGE</div><div style="font-size:8px;color:#5e849e">React before price moves — not after the crowd</div></div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <span style="color:#9b5de5;font-size:11px;font-weight:900;min-width:20px">04</span>
+        <div><div style="font-size:9px;color:#e0e0e0;letter-spacing:1px;margin-bottom:2px">WHALE BATTLEFIELD</div><div style="font-size:8px;color:#5e849e">Track top wallets — green = profitable, red = losing</div></div>
+      </div>
+    </div>
+    <!-- HOW IT WORKS nudge banner -->
+    <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.3);border-radius:4px;margin-bottom:20px">
+      <span style="font-size:20px;flex-shrink:0">❓</span>
+      <div style="flex:1">
+        <div style="font-size:9px;color:#dff0f8;letter-spacing:1px;margin-bottom:3px">NEW TO THE TERMINAL?</div>
+        <div style="font-size:7.5px;color:#5e849e;line-height:1.5">Click <strong style="color:#00d4ff">❓ HOW IT WORKS</strong> in the top bar anytime for a full walkthrough — signals, pressure maps, whale intel & more.</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button onclick="document.getElementById('onboard-modal').style.display='none';openHowToUse&&openHow()" style="flex:1;padding:10px;background:linear-gradient(135deg,#00d4ff,#0099bb);border:none;color:#000;font-family:'Orbitron',sans-serif;font-size:9px;font-weight:900;letter-spacing:2px;cursor:pointer;border-radius:3px">SHOW ME HOW IT WORKS →</button>
+      <button onclick="document.getElementById('onboard-modal').style.display='none'" style="padding:10px 16px;background:transparent;border:1px solid rgba(0,212,255,.2);color:#5e849e;font-family:'Orbitron',sans-serif;font-size:8px;cursor:pointer;border-radius:3px">SKIP</button>
+    </div>
+  </div>
+</div>
 <div id="boot-overlay" style="position:fixed;inset:0;z-index:99999;background:#020509;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;font-family:'Orbitron',sans-serif">
   <div style="font-size:18px;font-weight:900;letter-spacing:4px;color:#00d4ff;text-shadow:0 0 20px rgba(0,212,255,.6)">🐋 WHALE.TERMINAL</div>
   <div id="boot-msg" style="font-size:9px;letter-spacing:2px;color:#5e849e;transition:color .3s">⏳ SYNCING MARKET INTELLIGENCE...</div>
@@ -521,7 +559,7 @@ canvas{display:block;width:100%;height:100%}
     <div class="pill"><div class="sdot live-dot"></div> <span id="feed-source">CONNECTING…</span></div>
     <div class="pill"><div class="sdot warn-dot"></div> REAL CLOB</div>
     <button id="sound-btn" onclick="toggleSound(this)" style="font-family:'Orbitron';font-size:8px;font-weight:700;letter-spacing:1.5px;padding:4px 12px;cursor:pointer;border:1px solid rgba(0,255,136,.3);background:rgba(0,255,136,.06);color:#00ff88;transition:.2s;white-space:nowrap;flex-shrink:0">🔊 SOUND</button>
-    <button id="how-btn" onclick="openHow()">❓ HOW IT WORKS</button>
+    <button id="how-btn" onclick="openHowToUse()">❓ HOW IT WORKS</button>
     <button id="unlock-btn" onclick="openAccessModal('license')">🔑 UNLOCK ACCESS</button>
     <div id="trial-wrap">
       <span id="trial-label">TRIAL</span>
@@ -652,16 +690,16 @@ canvas{display:block;width:100%;height:100%}
       <!-- Smart money + Imbalance row -->
       <div style="display:flex;gap:4px">
         <div style="flex:1;background:rgba(0,0,0,.3);border:1px solid var(--b1);padding:3px 7px;display:flex;flex-direction:column;gap:1px">
-          <span style="font-size:6px;color:var(--t3);letter-spacing:1.2px;text-transform:uppercase">Smart Money</span>
-          <span id="pp-smart-money" style="font-family:'Orbitron';font-size:9px;font-weight:700;color:#00d4ff">NEUTRAL</span>
+          <span style="font-size:8px;color:var(--t3);letter-spacing:1.2px;text-transform:uppercase">Smart Money</span>
+          <span id="pp-smart-money" style="font-family:'Orbitron';font-size:12px;font-weight:700;color:#00d4ff">NEUTRAL</span>
         </div>
         <div style="flex:1;background:rgba(0,0,0,.3);border:1px solid var(--b1);padding:3px 7px;display:flex;flex-direction:column;gap:1px">
-          <span style="font-size:6px;color:var(--t3);letter-spacing:1.2px;text-transform:uppercase">Imbalance</span>
-          <span id="pp-imbalance-val" style="font-family:'Orbitron';font-size:9px;font-weight:700;color:#ffb800">LOW</span>
+          <span style="font-size:8px;color:var(--t3);letter-spacing:1.2px;text-transform:uppercase">Imbalance</span>
+          <span id="pp-imbalance-val" style="font-family:'Orbitron';font-size:12px;font-weight:700;color:#ffb800">LOW</span>
         </div>
         <div style="flex:1;background:rgba(0,0,0,.3);border:1px solid var(--b1);padding:3px 7px;display:flex;flex-direction:column;gap:1px">
-          <span style="font-size:6px;color:var(--t3);letter-spacing:1.2px;text-transform:uppercase">Whale Flow</span>
-          <span id="pp-whale-flow" style="font-family:'Orbitron';font-size:9px;font-weight:700;color:#9b5de5">—</span>
+          <span style="font-size:8px;color:var(--t3);letter-spacing:1.2px;text-transform:uppercase">Whale Flow</span>
+          <span id="pp-whale-flow" style="font-family:'Orbitron';font-size:12px;font-weight:700;color:#9b5de5">—</span>
         </div>
       </div>
 
@@ -2413,7 +2451,7 @@ function _startTrialTimer() {
   if (_trialTimer) return; // already running — no duplicates
   _trialTimer = setInterval(() => {
     if (appMode !== 'trial') { clearInterval(_trialTimer); _trialTimer = null; return; }
-    const start = parseInt(localStorage.getItem('wt_trial_start') || '0');
+    const start = parseInt(localStorage.getItem(_TSK) || '0');
     const elapsed = start ? Math.floor((Date.now() - start) / 1000) : 0;
     trialRemaining = Math.max(0, 300 - elapsed);
     trialTotal = 300;
@@ -2599,6 +2637,8 @@ connect();
 
 // ═══ LICENSE SYSTEM ══════════════════════════════════════════════════════════
 const _LK = 'wt_lic', _DK = 'wt_dev', _CK = 'wt_cache';
+const _TSK = 'wt_trial_start'; // trial start timestamp key
+const _OBK = 'wt_onboarded';  // onboarding seen key
 let _licValid = false, _revalTimer = null;
 
 function _devId() {
@@ -2642,7 +2682,8 @@ async function _licValidate(key) {
 
 function _applyLicState(valid, warning) {
   if (valid) {
-    localStorage.setItem('wt_trial_start', '0'); // clear trial
+    localStorage.removeItem(_TSK); // clear trial permanently on premium
+    localStorage.removeItem('wt_trial_used');
     _applyAppMode('premium');
     if (warning === 'multiple_devices') document.getElementById('am-warn-banner')?.classList.add('show');
   } else {
@@ -2786,7 +2827,17 @@ function _submitPayment() {
   const note = document.getElementById('am-tg-note');
   if (note) note.innerHTML='<strong style="color:var(--cyan)">Details copied to clipboard.</strong> Also send to our Telegram. Key arrives within 24h.';
 }
-
+// ─── Onboarding ───────────────────────────────────────────────────────────────
+function _showOnboarding() {
+  if (localStorage.getItem(_OBK)) return; // already seen
+  localStorage.setItem(_OBK, '1');
+  const m = document.getElementById('onboard-modal');
+  if (m) m.style.display = 'flex';
+}
+function openHowToUse() {
+  const m = document.getElementById('onboard-modal');
+  if (m) m.style.display = 'flex';
+}
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 (async function _licBoot() {
   await new Promise(r => { if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', r); else r(); });
@@ -2794,12 +2845,11 @@ function _submitPayment() {
   const msg = document.getElementById('boot-msg');
   const sub = document.getElementById('boot-sub');
   const bar = document.getElementById('boot-bar');
-
   const steps = [
-    [0,   'FETCHING SIGNALS...',        'CALIBRATING MODELS...'],
-    [800, 'LOADING WHALE ACTIVITY...',  'SCANNING ORDER FLOW...'],
-    [1800,'MAPPING MARKET PRESSURE...', 'WARMING UP ENGINE...'],
-    [3200,'🚀 ALMOST READY...',         'FIRST LOAD MAY TAKE ~30s'],
+    [0,   'FETCHING SIGNALS...',       'CALIBRATING MODELS...'],
+    [800, 'LOADING WHALE ACTIVITY...', 'SCANNING ORDER FLOW...'],
+    [1800,'MAPPING MARKET PRESSURE...','WARMING UP ENGINE...'],
+    [3200,'🚀 ALMOST READY...',        'FIRST LOAD MAY TAKE ~30s'],
   ];
   let pct = 0;
   steps.forEach(([delay, m, s]) => { setTimeout(() => { if(msg) msg.textContent=m; if(sub) sub.textContent=s; pct=Math.min(pct+25,90); if(bar) bar.style.width=pct+'%'; }, delay); });
@@ -2809,46 +2859,66 @@ function _submitPayment() {
     setTimeout(() => { const ov = document.getElementById('boot-overlay'); if(ov){ov.style.transition='opacity .5s';ov.style.opacity='0';setTimeout(()=>ov.remove(),500);} }, 300);
   }
 
-  // ── Step 1: check stored license ──
-  const stored = localStorage.getItem(_LK);
-  if (stored) {
+  // ── STEP 1: check stored license ──
+  const storedKey = localStorage.getItem(_LK);
+  if (storedKey) {
     try {
       let r = _licCacheValid();
-      if (!r) r = await _licValidate(stored);
+      if (!r) {
+        if (msg) { msg.textContent = 'VERIFYING LICENSE...'; }
+        r = await _licValidate(storedKey);
+      }
       if (r && r.valid) {
         _applyAppMode('premium');
         _startRevalidation();
         console.log('%c✓ PREMIUM','color:#00FF88');
-        hideOverlay(); return;
+        hideOverlay();
+        _showOnboarding();
+        return;
+      } else {
+        // stored key invalid — clear it
+        localStorage.removeItem(_LK);
+        localStorage.removeItem(_CK);
       }
     } catch(err) {
+      // network error — trust cache if exists, else fall through to trial
+      const cache = _licCacheValid();
+      if (cache) {
+        _applyAppMode('premium');
+        _startRevalidation();
+        hideOverlay();
+        _showOnboarding();
+        return;
+      }
       if (msg) { msg.textContent = '⚠️ CONNECTION ISSUE. RETRYING...'; msg.style.color = '#ffb800'; }
       await new Promise(r => setTimeout(r, 4000));
       try {
-        const r2 = await _licValidate(stored);
-        if (r2.valid) { _applyAppMode('premium'); _startRevalidation(); hideOverlay(); return; }
+        const r2 = await _licValidate(storedKey);
+        if (r2.valid) { _applyAppMode('premium'); _startRevalidation(); hideOverlay(); _showOnboarding(); return; }
       } catch {}
     }
   }
 
-  // ── Step 2: trial or locked ──
-  const start = parseInt(localStorage.getItem('wt_trial_start') || '0');
+  // ── STEP 2: trial or locked — NEVER overwrite existing trialStart ──
   const now = Date.now();
-  if (!start) {
-    localStorage.setItem('wt_trial_start', String(now));
-    _applyAppMode('trial');
-    console.log('%c○ TRIAL started','color:#ffb800');
-  } else {
-    const elapsed = Math.floor((now - start) / 1000);
-    if (elapsed < 300) {
-      _applyAppMode('trial');
-      console.log('%c○ TRIAL resuming','color:#ffb800');
-    } else {
-      _applyAppMode('locked');
-      console.log('%c✗ LOCKED','color:#ff3355');
-    }
+  let trialStart = parseInt(localStorage.getItem(_TSK) || '0');
+  if (!trialStart) {
+    // first visit
+    trialStart = now;
+    localStorage.setItem(_TSK, String(trialStart));
+    localStorage.setItem('wt_trial_used', 'true');
   }
+  const elapsed = Math.floor((now - trialStart) / 1000);
+  if (elapsed < 300) {
+    _applyAppMode('trial');
+    console.log('%c○ TRIAL — ' + (300 - elapsed) + 's remaining','color:#ffb800');
+  } else {
+    _applyAppMode('locked');
+    console.log('%c✗ LOCKED — trial expired','color:#ff3355');
+  }
+
   hideOverlay();
+  _showOnboarding();
 })();
 
 document.getElementById('lic-input')?.addEventListener('keydown', e => { if (e.key==='Enter') _licActivate(); });
