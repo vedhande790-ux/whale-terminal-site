@@ -827,6 +827,7 @@ canvas{display:block;width:100%;height:100%}
       <button class="emf-btn" id="emf-CRITICAL" onclick="filterEdgeModal('CRITICAL')" style="font-family:'JetBrains Mono';font-size:7px;padding:2px 8px;background:transparent;border:1px solid rgba(255,51,85,.3);color:#ff3355;cursor:pointer">CRITICAL</button>
       <button class="emf-btn" id="emf-HIGH"   onclick="filterEdgeModal('HIGH')"     style="font-family:'JetBrains Mono';font-size:7px;padding:2px 8px;background:transparent;border:1px solid rgba(255,184,0,.3);color:#ffb800;cursor:pointer">HIGH</button>
       <button class="emf-btn" id="emf-MEDIUM" onclick="filterEdgeModal('MEDIUM')"   style="font-family:'JetBrains Mono';font-size:7px;padding:2px 8px;background:transparent;border:1px solid rgba(0,212,255,.2);color:#00d4ff;cursor:pointer;opacity:.6">MEDIUM</button>
+      <button onclick="openSignalGuide()" style="font-family:'Orbitron';font-size:8px;padding:4px 12px;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.4);color:#00d4ff;cursor:pointer;letter-spacing:1px;margin-right:4px">❓ HOW TO READ THIS</button>
       <button onclick="closeEdgeFeedModal()" style="font-family:'Orbitron';font-size:8px;padding:4px 12px;background:rgba(255,51,85,.08);border:1px solid rgba(255,51,85,.4);color:#ff3355;cursor:pointer;letter-spacing:1px">✕ CLOSE</button>
     </div>
   </div>
@@ -3757,5 +3758,166 @@ document.getElementById('lic-input')?.addEventListener('keydown', e => { if (e.k
     <div class="wa-timer-bar" id="wa-timer-bar"></div>
   </div>
 </div>
+<!-- SIGNAL GUIDE MODAL -->
+<div id="signal-guide-modal" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.92);align-items:center;justify-content:center;overflow-y:auto">
+  <div style="position:relative;max-width:720px;width:94%;margin:24px auto;background:#060e18;border:1px solid rgba(0,212,255,.2);border-radius:6px;font-family:'JetBrains Mono',monospace;overflow:hidden">
+
+    <!-- Top glow bar -->
+    <div style="height:2px;background:linear-gradient(90deg,transparent,#00d4ff 30%,#00ff88 70%,transparent)"></div>
+
+    <!-- Header -->
+    <div style="padding:20px 24px 16px;background:linear-gradient(135deg,rgba(0,212,255,.07),rgba(0,255,136,.04))">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div style="font-family:'Orbitron';font-size:13px;font-weight:900;color:#00d4ff;letter-spacing:3px;text-shadow:0 0 20px rgba(0,212,255,.5)">⚡ EDGE FEED — SIGNAL GUIDE</div>
+          <div style="font-size:8px;color:#5e849e;letter-spacing:2px;margin-top:4px">HOW TO READ · WHAT EACH FIELD MEANS · HOW TO ACT</div>
+        </div>
+        <button onclick="closeSignalGuide()" style="background:rgba(255,51,85,.1);border:1px solid rgba(255,51,85,.4);color:#ff3355;font-family:'Orbitron';font-size:9px;padding:6px 14px;cursor:pointer;border-radius:3px">✕ CLOSE</button>
+      </div>
+    </div>
+
+    <!-- Intro -->
+    <div style="padding:16px 24px;border-bottom:1px solid rgba(255,255,255,.06);font-size:8.5px;color:#8fafc7;line-height:1.8">
+      The Edge Feed is your <span style="color:#00ff88;font-weight:700">real-time alpha scanner</span>. It detects when whale wallets + order flow create a mispricing window on Polymarket. Each card is a live opportunity — you have a <span style="color:#ffb800;font-weight:700">narrow time window</span> to enter before the crowd catches up and the edge evaporates.
+    </div>
+
+    <div style="padding:20px 24px;display:flex;flex-direction:column;gap:20px">
+
+      <!-- SIGNAL TYPES -->
+      <div>
+        <div style="font-family:'Orbitron';font-size:8px;font-weight:700;letter-spacing:2.5px;color:#5e849e;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.05)">01 — SIGNAL TYPES</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+
+          <div style="padding:12px;background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.15);border-radius:4px">
+            <div style="font-size:9px;font-weight:700;color:#00d4ff;letter-spacing:1.5px;margin-bottom:6px">⚡ MOMENTUM BREAK</div>
+            <div style="font-size:7.5px;color:#8fafc7;line-height:1.7">Price (probability) crossed a key structural level with volume confirmation. Think of it as a <span style="color:#e0e0e0">breakout</span> — the market has shifted its mind. Window: <span style="color:#ffb800">5–12 min</span>. Hit rate: <span style="color:#00ff88">69%</span>.</div>
+          </div>
+
+          <div style="padding:12px;background:rgba(0,255,136,.04);border:1px solid rgba(0,255,136,.15);border-radius:4px">
+            <div style="font-size:9px;font-weight:700;color:#00ff88;letter-spacing:1.5px;margin-bottom:6px">🚀 VELOCITY SURGE</div>
+            <div style="font-size:7.5px;color:#8fafc7;line-height:1.7">Volume just spiked 4× above the 60-min baseline. Order flow is <span style="color:#e0e0e0">accelerating fast</span> — buyers or sellers are flooding in aggressively. Window: <span style="color:#ffb800">3–8 min</span>. Hit rate: <span style="color:#00ff88">61%</span>.</div>
+          </div>
+
+          <div style="padding:12px;background:rgba(155,93,229,.04);border:1px solid rgba(155,93,229,.15);border-radius:4px">
+            <div style="font-size:9px;font-weight:700;color:#9b5de5;letter-spacing:1.5px;margin-bottom:6px">🐋 SMART CLUSTER</div>
+            <div style="font-size:7.5px;color:#8fafc7;line-height:1.7">3+ alpha wallets entered the same outcome within 15 minutes. When multiple known whales pile in together — that's <span style="color:#e0e0e0">coordinated conviction</span>. Window: <span style="color:#ffb800">10–25 min</span>. Hit rate: <span style="color:#00ff88">72%</span>.</div>
+          </div>
+
+          <div style="padding:12px;background:rgba(255,184,0,.04);border:1px solid rgba(255,184,0,.15);border-radius:4px">
+            <div style="font-size:9px;font-weight:700;color:#ffb800;letter-spacing:1.5px;margin-bottom:6px">🔄 WHALE REVERSAL</div>
+            <div style="font-size:7.5px;color:#8fafc7;line-height:1.7">A high-score whale flipped direction vs their prior position. Smart money <span style="color:#e0e0e0">changed its mind</span> — the old thesis is broken. Window: <span style="color:#ffb800">8–20 min</span>. Hit rate: <span style="color:#00ff88">74%</span>.</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- PRIORITY -->
+      <div>
+        <div style="font-family:'Orbitron';font-size:8px;font-weight:700;letter-spacing:2.5px;color:#5e849e;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.05)">02 — PRIORITY LEVELS</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;align-items:center;gap:12px;padding:8px 12px;background:rgba(255,51,85,.06);border-left:3px solid #ff3355">
+            <span style="font-size:8px;font-weight:700;color:#ff3355;letter-spacing:1.5px;min-width:70px">CRITICAL</span>
+            <span style="font-size:7.5px;color:#8fafc7;line-height:1.6">Whale size $50K+, confidence 80%+. <span style="color:#fff">Drop everything and look at this.</span> Largest wallets moving with force. Act fast.</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:8px 12px;background:rgba(255,184,0,.06);border-left:3px solid #ffb800">
+            <span style="font-size:8px;font-weight:700;color:#ffb800;letter-spacing:1.5px;min-width:70px">HIGH</span>
+            <span style="font-size:7.5px;color:#8fafc7;line-height:1.6">$20K–50K position, strong signal alignment. <span style="color:#fff">High conviction play.</span> Worth entering if window is still open.</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:8px 12px;background:rgba(0,212,255,.04);border-left:3px solid rgba(0,212,255,.4)">
+            <span style="font-size:8px;font-weight:700;color:#00d4ff;letter-spacing:1.5px;min-width:70px">MEDIUM</span>
+            <span style="font-size:7.5px;color:#8fafc7;line-height:1.6">Smaller size or partial signal confirmation. <span style="color:#fff">Use as context</span>, not a primary trigger. Good for stack building.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- FIELDS GLOSSARY -->
+      <div>
+        <div style="font-family:'Orbitron';font-size:8px;font-weight:700;letter-spacing:2.5px;color:#5e849e;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.05)">03 — CARD FIELDS EXPLAINED</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+
+          <div style="padding:10px 12px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:3px">
+            <div style="font-size:8px;color:#00d4ff;font-weight:700;margin-bottom:4px">TARGET</div>
+            <div style="font-size:7.5px;color:#8fafc7;line-height:1.6">Current market price for the outcome (in cents / probability %). This is what Polymarket currently thinks.</div>
+          </div>
+
+          <div style="padding:10px 12px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:3px">
+            <div style="font-size:8px;color:#00d4ff;font-weight:700;margin-bottom:4px">MODEL</div>
+            <div style="font-size:7.5px;color:#8fafc7;line-height:1.6">The algo's estimate of the true probability based on whale flow + order data. If MODEL &gt; TARGET → market is underpriced.</div>
+          </div>
+
+          <div style="padding:10px 12px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:3px">
+            <div style="font-size:8px;color:#00ff88;font-weight:700;margin-bottom:4px">EDGE</div>
+            <div style="font-size:7.5px;color:#8fafc7;line-height:1.6">Model minus Target = <span style="color:#00ff88">your alpha</span>. A +5% edge means the market is 5 cents wrong. Bigger edge = bigger opportunity.</div>
+          </div>
+
+          <div style="padding:10px 12px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:3px">
+            <div style="font-size:8px;color:#ffb800;font-weight:700;margin-bottom:4px">WINDOW</div>
+            <div style="font-size:7.5px;color:#8fafc7;line-height:1.6">How long the edge typically survives before the crowd arbs it away. After this — <span style="color:#ff3355">you're too late</span>. Time stamps from when signal fired.</div>
+          </div>
+
+          <div style="padding:10px 12px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:3px">
+            <div style="font-size:8px;color:#9b5de5;font-weight:700;margin-bottom:4px">CONFIDENCE BARS</div>
+            <div style="font-size:7.5px;color:#8fafc7;line-height:1.6"><span style="color:#e0e0e0">VOL</span> = volume strength · <span style="color:#e0e0e0">STREET</span> = structural price level · <span style="color:#e0e0e0">MOM</span> = momentum direction. All 3 high = strongest signal.</div>
+          </div>
+
+          <div style="padding:10px 12px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:3px">
+            <div style="font-size:8px;color:#00d4ff;font-weight:700;margin-bottom:4px">HIT RATE / AVG MOVE</div>
+            <div style="font-size:7.5px;color:#8fafc7;line-height:1.6">Historical accuracy of this signal type (n = sample size). AVG MOVE = how much price moved after signal fired on average.</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- HOW TO ACT -->
+      <div>
+        <div style="font-family:'Orbitron';font-size:8px;font-weight:700;letter-spacing:2.5px;color:#5e849e;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.05)">04 — HOW TO ACT ON A SIGNAL</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;gap:12px;align-items:flex-start;padding:8px 10px;background:rgba(0,255,136,.04);border-radius:3px">
+            <span style="color:#00ff88;font-weight:900;font-size:10px;min-width:18px">1</span>
+            <span style="font-size:7.5px;color:#8fafc7;line-height:1.7">Filter by <span style="color:#ff3355;font-weight:700">CRITICAL</span> or <span style="color:#ffb800;font-weight:700">HIGH</span> priority first — ignore MEDIUM until you're comfortable with the system.</span>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start;padding:8px 10px;background:rgba(0,255,136,.04);border-radius:3px">
+            <span style="color:#00ff88;font-weight:900;font-size:10px;min-width:18px">2</span>
+            <span style="font-size:7.5px;color:#8fafc7;line-height:1.7">Check the <span style="color:#fff;font-weight:700">WINDOW</span> — if the signal fired 10 min ago on a 3–8 min window, it's expired. Skip it.</span>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start;padding:8px 10px;background:rgba(0,255,136,.04);border-radius:3px">
+            <span style="color:#00ff88;font-weight:900;font-size:10px;min-width:18px">3</span>
+            <span style="font-size:7.5px;color:#8fafc7;line-height:1.7">Look at <span style="color:#fff;font-weight:700">EDGE %</span> — anything above +3% is actionable. Combine with all 3 confidence bars being high for max conviction.</span>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start;padding:8px 10px;background:rgba(0,255,136,.04);border-radius:3px">
+            <span style="color:#00ff88;font-weight:900;font-size:10px;min-width:18px">4</span>
+            <span style="font-size:7.5px;color:#8fafc7;line-height:1.7">Click <span style="color:#00d4ff;font-weight:700">WATCH</span> on the signal card → then <span style="color:#00d4ff;font-weight:700">BUY ON POLYMARKET</span> at the bottom. Enter at current price, let the edge close.</span>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start;padding:8px 10px;background:rgba(255,51,85,.04);border-radius:3px">
+            <span style="color:#ff3355;font-weight:900;font-size:10px;min-width:18px">⚠</span>
+            <span style="font-size:7.5px;color:#8fafc7;line-height:1.7"><span style="color:#ff3355;font-weight:700">Never chase expired windows.</span> If you missed it — wait for the next signal. There's always another one.</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div style="padding:14px 24px;background:rgba(0,212,255,.03);border-top:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between">
+      <div style="font-size:7px;color:#3a5a72;letter-spacing:1.5px">WHALE.TERMINAL · SIGNAL INTELLIGENCE ENGINE</div>
+      <button onclick="closeSignalGuide()" style="background:linear-gradient(90deg,rgba(0,212,255,.15),rgba(0,255,136,.08));border:1px solid rgba(0,212,255,.4);color:#00d4ff;font-family:'Orbitron';font-size:8px;font-weight:700;padding:7px 20px;cursor:pointer;border-radius:3px;letter-spacing:1px">GOT IT — BACK TO SIGNALS</button>
+    </div>
+
+    <div style="height:2px;background:linear-gradient(90deg,transparent,#00ff88 30%,#00d4ff 70%,transparent)"></div>
+  </div>
+</div>
+
+<script>
+function openSignalGuide() {
+  const m = document.getElementById('signal-guide-modal');
+  m.style.display = 'flex';
+  m.scrollTop = 0;
+}
+function closeSignalGuide() {
+  document.getElementById('signal-guide-modal').style.display = 'none';
+}
+</script>
+
+</body>
 </body>
 </html>
