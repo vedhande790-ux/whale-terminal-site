@@ -26,7 +26,9 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;
   background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.04) 2px,rgba(0,0,0,.04) 4px)}
 body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9998;
   background:radial-gradient(ellipse at 50% 50%,transparent 55%,rgba(0,0,0,.65) 100%)}
-
+.am-coin-btn{background:none;border:1px solid var(--b1);color:var(--t2);font-family:'JetBrains Mono';font-size:9px;font-weight:700;padding:4px 12px;cursor:pointer;transition:.15s;letter-spacing:.5px}
+.am-coin-btn.active{border-color:var(--cyan);color:var(--cyan);background:rgba(0,212,255,.08)}
+.am-coin-btn:hover:not(.active){border-color:var(--b2);color:var(--t1)}
 /* Heatmap Titles Fix: ensure heatmap titles are visible across Windows rendering paths */
 .hm-heatmap { display:grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap:12px; padding:12px; }
 .hm-heatmap .tile { background: rgba(0,0,0,.85); border-radius:6px; padding:8px; overflow:hidden; border:1px solid rgba(0,0,0,.4); }
@@ -923,7 +925,16 @@ canvas{display:block;width:100%;height:100%}
       </div>
 
       <div class="am-section-label">Send Payment To</div>
-      <div id="am-addr-list"><div style="color:var(--t3);font-size:8px;padding:8px">Loading…</div></div>
+
+      <!-- Coin selector -->
+      <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">
+        <button class="am-coin-btn active" id="coin-usdt" onclick="selectCoin('usdt')">💵 USDT</button>
+        <button class="am-coin-btn" id="coin-btc" onclick="selectCoin('btc')">₿ BTC</button>
+        <button class="am-coin-btn" id="coin-sol" onclick="selectCoin('sol')">◎ SOL</button>
+        <button class="am-coin-btn" id="coin-ltc" onclick="selectCoin('ltc')">Ł LTC</button>
+      </div>
+
+      <div id="am-addr-list"></div>
 
       <div class="am-box" style="margin-top:14px;margin-bottom:14px">
         <div style="font-family:'Orbitron';font-size:8px;font-weight:700;letter-spacing:2px;color:var(--yellow);margin-bottom:8px">HOW TO GET ACCESS</div>
@@ -948,7 +959,7 @@ canvas{display:block;width:100%;height:100%}
         <div style="margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,.06);font-size:7.5px;color:var(--t3);line-height:1.7">
           <span style="color:var(--red);font-weight:700">IMPORTANT</span>
           &nbsp;•&nbsp;Send exact amount
-          &nbsp;•&nbsp;Use correct network (TRC20 or ERC20)
+          &nbsp;•&nbsp;Use correct network for chosen coin
           &nbsp;•&nbsp;Double-check address before sending
         </div>
       </div>
@@ -2764,20 +2775,66 @@ function switchAmTab(tab) {
   if (tab === 'buy') _loadPaymentInfo();
 }
 
+const _COINS = {
+  usdt: {
+    label: 'USDT',
+    networks: [
+      { name: 'USDT · TRC20 (Tron)', address: 'TJ82R2Yqq11KNUudbYj4JPCPggeEseztKi', note: '✔ Recommended — lowest fees' },
+      { name: 'USDT · BEP20 (BSC)', address: '0x8d2bc6fc63f04464016e382ed3670c1dec8f746e', note: '' },
+      { name: 'USDT · ERC20 (Ethereum)', address: '0x8d2bc6fc63f04464016e382ed3670c1dec8f746e', note: '⚠ High gas fees' },
+      { name: 'USDT · SOL (Solana)', address: 'BKCrZbTrEUHcyH5gNoyiUQTGQBzTUjB9nzhd55rsTymu', note: '✔ Fast & cheap' },
+    ]
+  },
+  btc: {
+    label: 'BTC',
+    networks: [
+      { name: 'BTC · Bitcoin Network', address: '1MJ1V1R2hY1gtjYySausLaMneeThatZf4T', note: '⚠ Allow 1–3 confirmations' },
+    ]
+  },
+  sol: {
+    label: 'SOL',
+    networks: [
+      { name: 'SOL · Solana Network', address: 'BKCrZbTrEUHcyH5gNoyiUQTGQBzTUjB9nzhd55rsTymu', note: '✔ Fast & cheap' },
+    ]
+  },
+  ltc: {
+    label: 'LTC',
+    networks: [
+      { name: 'LTC · Litecoin Network', address: 'LRRrQ4F2HRQioQeZQFdS5uNytCGnTVu5Nd', note: '✔ Fast & low fees' },
+    ]
+  },
+};
+let _selectedCoin = 'usdt';
+
+function selectCoin(coin) {
+  _selectedCoin = coin;
+  ['usdt','btc','sol','ltc'].forEach(c => {
+    document.getElementById('coin-'+c)?.classList.toggle('active', c === coin);
+  });
+  _renderAddrs();
+}
+
+function _renderAddrs() {
+  const el = document.getElementById('am-addr-list');
+  if (!el) return;
+  const coin = _COINS[_selectedCoin];
+  el.innerHTML = coin.networks.map(n => `
+    <div class="am-addr-box">
+      <div style="flex:1;min-width:0">
+        <div class="am-network">${n.name}${n.note ? `<span style="margin-left:8px;font-size:7px;color:var(--yellow);font-weight:400">${n.note}</span>` : ''}</div>
+        <div class="am-addr">${n.address}</div>
+      </div>
+      <button class="am-copy" onclick="_copyAddr('${n.address}',this)">COPY</button>
+    </div>`).join('');
+}
+
 let _payInfoLoaded = false;
 async function _loadPaymentInfo() {
   if (_payInfoLoaded) return;
   try {
     const j = await (await fetch(`${API}/api/payment-info`)).json();
     _payInfoLoaded = true;
-    const addrList = document.getElementById('am-addr-list');
-    if (addrList && j.networks) {
-      addrList.innerHTML = j.networks.map(n => `
-        <div class="am-addr-box">
-          <div style="flex:1;min-width:0"><div class="am-network">${n.name}</div><div class="am-addr">${n.address}</div></div>
-          <button class="am-copy" onclick="_copyAddr('${n.address}',this)">COPY</button>
-        </div>`).join('');
-    }
+    _renderAddrs(); // use hardcoded addresses; ignore server j.networks
     function _submitPayment() {
   const txHash   = (document.getElementById('am-txhash')?.value||'').trim();
   const telegram = (document.getElementById('am-telegram')?.value||'').trim();
