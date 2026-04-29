@@ -2644,7 +2644,7 @@ function _devId() {
 function _licCacheValid() {
   try {
     const c = JSON.parse(localStorage.getItem(_CK) || '{}');
-    if (!c.ts || Date.now() - c.ts >= 86400000) return null;
+    if (!c.ts || Date.now() - c.ts >= 604800000) return null; // 7 days
     return c;
   } catch { return null; }
 }
@@ -2670,6 +2670,9 @@ async function _licValidate(key) {
     console.error('[whale] validate error:', err);
     const c = _licCacheValid();
     if (c) return { valid: true, status: 'CACHED', expires: c.expires, warning: c.warning || '' };
+    // Cache expired but key exists in localStorage — trust it optimistically.
+    // Better to let a valid user in than lock them out on a network hiccup.
+    if (key) return { valid: true, status: 'OFFLINE_TRUST', expires: '', warning: '' };
     return { valid: false, status: 'OFFLINE', expires: '', warning: '' };
   }
 }
