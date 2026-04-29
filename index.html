@@ -2628,7 +2628,21 @@ renderTicker();
 for(let i=0;i<30;i++){ equityVal+=((Math.random()-.47)*70); equityCurve.push({ts:Date.now()/1000-30+i,v:equityVal}); }
 drawEquity(); updateEquityUI(); drawPriceChart();
 // ═══ LICENSE SYSTEM ══════════════════════════════════════════════════════════
-const _LK = 'wt_lic', _DK = 'wt_dev', _CK = 'wt_cache';
+const _LK = 'wt_lic', _DK = 'wt_dev', _CK = 'wt_cache', _SK = 'wt_session';
+
+// Returns true if user activated within last 24h — skip all validation
+function _sessionValid() {
+  try {
+    const s = JSON.parse(localStorage.getItem(_SK) || '{}');
+    return !!(s.key && s.ts && (Date.now() - s.ts) < 86400000);
+  } catch { return false; }
+}
+function _sessionSet(key) {
+  localStorage.setItem(_SK, JSON.stringify({ key, ts: Date.now() }));
+}
+function _sessionClear() {
+  localStorage.removeItem(_SK);
+}
 
 connect();
 const _TSK = 'wt_trial_start'; // trial start timestamp key
@@ -2664,6 +2678,7 @@ async function _licValidate(key) {
     if (j.valid) {
       localStorage.setItem(_LK, key);
       localStorage.setItem(_CK, JSON.stringify({ ts: Date.now(), expires: j.expires, status: j.status, warning: j.warning }));
+      _sessionSet(key); // stamp 24h session
     }
     return j;
   } catch(err) {
@@ -2903,42 +2918,52 @@ function openHowToUse() {
   }
 
   // ── STEP 1: check stored license ──
+  // ── STEP 1: check stored license ──
   const storedKey = localStorage.getItem(_LK);
   if (storedKey) {
+    // Fast path: activated within last 24h → skip network entirely
+    if (_sessionValid()) {
+      _applyAppMode('premium');
+      _startRevalidation();
+      console.log('%c✓ PREMIUM (session)','color:#00FF88');
+      hideOverlay();
+      _showOnboarding();
+      return;
+    }
+    // Slow path: session expired → revalidate with server
     try {
-      let r = _licCacheValid();
-      if (!r) {
-        if (msg) { msg.textContent = 'VERIFYING LICENSE...'; }
-        r = await _licValidate(storedKey);
-      }
+      if (msg) { msg.textContent = 'VERIFYING LICENSE...'; }
+      const r = await _licValidate(storedKey);
       if (r && r.valid) {
+        _sessionSet(storedKey); // renew 24h session
         _applyAppMode('premium');
         _startRevalidation();
         console.log('%c✓ PREMIUM','color:#00FF88');
         hideOverlay();
         _showOnboarding();
         return;
-      } else {
-        // stored key invalid — clear it
-        localStorage.removeItem(_LK);
-        localStorage.removeItem(_CK);
-      }
-    } catch(err) {
-      // network error — trust cache if exists, else fall through to trial
-      const cache = _licCacheValid();
-      if (cache) {
+      } else if (r && (r.status === 'OFFLINE' || r.status === 'OFFLINE_TRUST')) {
+        // can't reach server — trust stored key, renew session
+        _sessionSet(storedKey);
         _applyAppMode('premium');
         _startRevalidation();
         hideOverlay();
         _showOnboarding();
         return;
+      } else {
+        // server explicitly rejected — clear everything
+        _sessionClear();
+        localStorage.removeItem(_LK);
+        localStorage.removeItem(_CK);
       }
-      if (msg) { msg.textContent = '⚠️ CONNECTION ISSUE. RETRYING...'; msg.style.color = '#ffb800'; }
-      await new Promise(r => setTimeout(r, 4000));
-      try {
-        const r2 = await _licValidate(storedKey);
-        if (r2.valid) { _applyAppMode('premium'); _startRevalidation(); hideOverlay(); _showOnboarding(); return; }
-      } catch {}
+    } catch(err) {
+      // network totally dead — trust stored key
+      _sessionSet(storedKey);
+      _applyAppMode('premium');
+      _startRevalidation();
+      hideOverlay();
+      _showOnboarding();
+      return;
     }
   }
 
