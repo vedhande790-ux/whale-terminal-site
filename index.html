@@ -2462,14 +2462,12 @@ function _applyAppMode(mode) {
 
 function _startTrialTimer() {
   if (_trialTimer) return; // already running — no duplicates
+  // trialRemaining is set from server Snapshot — just tick it down locally
   _trialTimer = setInterval(() => {
     if (appMode !== 'trial') { clearInterval(_trialTimer); _trialTimer = null; return; }
-    const start = parseInt(localStorage.getItem(_TSK) || '0');
-    const elapsed = start ? Math.floor((Date.now() - start) / 1000) : 0;
-    trialRemaining = Math.max(0, 300 - elapsed);
-    trialTotal = 300;
+    trialRemaining = Math.max(0, trialRemaining - 1);
     const fill = document.getElementById('trial-fill');
-    if (fill) fill.style.width = (trialRemaining / 300 * 100) + '%';
+    if (fill) fill.style.width = (trialRemaining / trialTotal * 100) + '%';
     const el = document.getElementById('trial-time');
     const m = Math.floor(trialRemaining / 60), s = trialRemaining % 60;
     if (el) { el.textContent = `${m}:${s.toString().padStart(2,'0')}`; el.style.color = trialRemaining < 60 ? 'var(--red)' : trialRemaining < 120 ? 'var(--yellow)' : 'var(--green)'; }
@@ -2646,10 +2644,10 @@ renderTicker();
 // Seed equity
 for(let i=0;i<30;i++){ equityVal+=((Math.random()-.47)*70); equityCurve.push({ts:Date.now()/1000-30+i,v:equityVal}); }
 drawEquity(); updateEquityUI(); drawPriceChart();
-connect();
-
 // ═══ LICENSE SYSTEM ══════════════════════════════════════════════════════════
 const _LK = 'wt_lic', _DK = 'wt_dev', _CK = 'wt_cache';
+
+connect();
 const _TSK = 'wt_trial_start'; // trial start timestamp key
 const _OBK = 'wt_onboarded';  // onboarding seen key
 let _licValid = false, _revalTimer = null;
@@ -2968,6 +2966,7 @@ function openHowToUse() {
     localStorage.setItem('wt_trial_used', 'true');
   }
   const elapsed = Math.floor((now - trialStart) / 1000);
+  trialRemaining = Math.max(0, 300 - elapsed); // local estimate until server confirms
   if (elapsed < 300) {
     _applyAppMode('trial');
     console.log('%c○ TRIAL — ' + (300 - elapsed) + 's remaining','color:#ffb800');
@@ -3322,18 +3321,42 @@ function renderHowContent() {
       const glowColor = isBuy ? '#00FF88' : '#FF3355';
       const borderColor= isBuy ? `rgba(0,255,136,${0.5+score/maxScore*0.5})` : `rgba(255,51,85,${0.5+score/maxScore*0.5})`;
 
-      // outer glow ring
-      ctx.shadowColor=glowColor; ctx.shadowBlur=r*0.8;
+      // deep glow halo
+      const halo = ctx.createRadialGradient(x,y,r*0.5,x,y,r*2.2);
+      halo.addColorStop(0, isBuy?'rgba(0,255,136,.18)':'rgba(255,51,85,.18)');
+      halo.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.beginPath(); ctx.arc(x,y,r*2.2,0,Math.PI*2);
+      ctx.fillStyle=halo; ctx.fill();
+
+      // main bubble — radial gradient for depth
+      const grad = ctx.createRadialGradient(x-r*0.3, y-r*0.3, r*0.05, x, y, r);
+      if(isBuy){
+        grad.addColorStop(0,'rgba(180,255,220,.95)');
+        grad.addColorStop(0.4,'rgba(0,255,136,.75)');
+        grad.addColorStop(1,'rgba(0,80,50,.6)');
+      } else {
+        grad.addColorStop(0,'rgba(255,180,180,.95)');
+        grad.addColorStop(0.4,'rgba(255,51,85,.75)');
+        grad.addColorStop(1,'rgba(80,0,20,.6)');
+      }
+      ctx.shadowColor=glowColor; ctx.shadowBlur=r*1.4;
       ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
-      ctx.fillStyle=baseColor; ctx.fill();
-      ctx.strokeStyle=borderColor; ctx.lineWidth=1.5; ctx.stroke();
+      ctx.fillStyle=grad; ctx.fill();
+      ctx.strokeStyle=borderColor; ctx.lineWidth=1.8; ctx.stroke();
       ctx.shadowBlur=0;
 
-      // inner bright core
-      const coreR = r*0.3;
-      ctx.beginPath(); ctx.arc(x,y,coreR,0,Math.PI*2);
-      ctx.fillStyle=isBuy?'rgba(0,255,136,.9)':'rgba(255,51,85,.9)';
-      ctx.shadowColor=glowColor; ctx.shadowBlur=coreR*2;
+      // specular highlight (top-left shine)
+      const shine = ctx.createRadialGradient(x-r*0.35,y-r*0.35,0,x-r*0.35,y-r*0.35,r*0.55);
+      shine.addColorStop(0,'rgba(255,255,255,.45)');
+      shine.addColorStop(1,'rgba(255,255,255,0)');
+      ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
+      ctx.fillStyle=shine; ctx.fill();
+
+      // bright core dot
+      const coreR = r*0.22;
+      ctx.beginPath(); ctx.arc(x-r*0.2, y-r*0.2, coreR,0,Math.PI*2);
+      ctx.fillStyle='rgba(255,255,255,.7)';
+      ctx.shadowColor='#fff'; ctx.shadowBlur=coreR*3;
       ctx.fill(); ctx.shadowBlur=0;
 
       // rank badge for top 3
