@@ -1018,7 +1018,8 @@ let activeMktIdx=0, activeQty=100, ws;
 
 // ═══ WEBSOCKET ════════════════════════════════════════════════════
 function connect() {
-  const wsUrl = API.replace('http://', 'ws://').replace('https://', 'wss://') + '/ws';
+  const wsUrl = API.replace('http://', 'ws://').replace('https://', 'wss://') + '/ws'
+    + '?device_id=' + encodeURIComponent(_devId());
   ws = new WebSocket(wsUrl);
   ws.onopen = () => {
     const el = document.getElementById('feed-source');
