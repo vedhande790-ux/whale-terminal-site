@@ -1937,14 +1937,7 @@ function outcomeColor(name) {
   return p[h];
 }
 
-function synthBook(o) {
-  const p = o.price_cents||50;
-  const bids = Array.from({length:6},(_,i)=>({price:Math.max(1,p-0.5-i*1.2),size:300+Math.random()*20000/(i+1),fill_pct:Math.round(90/(i+1.1))}));
-  const asks = Array.from({length:6},(_,i)=>({price:Math.min(99,p+0.5+i*1.2),size:300+Math.random()*20000/(i+1),fill_pct:Math.round(90/(i+1.1))}));
-  const bl=bids.reduce((s,l)=>s+l.size,0), al=asks.reduce((s,l)=>s+l.size,0);
-  return { outcome_name:o.name, token_id:o.token_id, current_price:p, mid:p, spread:1.0,
-    bids, asks, best_bid:p-0.5, best_ask:p+0.5, bid_liquidity:bl, ask_liquidity:al, imbalance:(bl-al)/(bl+al+1) };
-}
+// synthBook removed — fake data forbidden. No book = show nothing.
 
 function outcomeColor(name) {
   const n=(name||'').toLowerCase();
@@ -2279,17 +2272,7 @@ function seedOHLC(m) {
   const basePrice = m.outcomes[0]?.price_cents||50;
   const mktTrades = TRADES.filter(t=>t.market_slug===m.slug||t.condition_id===m.condition_id).reverse();
   mktTrades.forEach(t=>ingestCandle(t.price_cents, t.size_usd, t.ts));
-  // Pad if needed
-  if(priceChartData.length<20) {
-    const needed = 30-priceChartData.length;
-    const startTs = (priceChartData[0]?.ts_start||Date.now()) - needed*candleDuration;
-    let lp=basePrice;
-    for(let i=0;i<needed;i++) {
-      const o=lp+(Math.random()-.5)*1.8, c=o+(Math.random()-.5)*1.2;
-      priceChartData.splice(i,0,{open:o,high:Math.max(o,c)+Math.random()*.4,low:Math.min(o,c)-Math.random()*.4,close:c,volume:1000+Math.random()*4000,ts_start:startTs+i*candleDuration});
-      lp=c;
-    }
-  }
+  // No padding — if fewer than 20 real trades, show what we have. Never fake candles.
   if(priceChartData.length>60) priceChartData=priceChartData.slice(-60);
   drawPriceChart();
 }
